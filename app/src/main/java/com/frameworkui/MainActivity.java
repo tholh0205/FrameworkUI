@@ -7,6 +7,8 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        presentFragment(new MainFragment(), false, NO_ANIMATION);
+        if (savedInstanceState == null) {
+            presentFragment(FragmentType.MAIN, null, -1, NO_ANIMATION);
+        }
     }
 }

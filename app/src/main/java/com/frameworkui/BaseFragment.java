@@ -143,6 +143,7 @@ public class BaseFragment {
 
     public void setRequestCode(int requestCode) {
         this.mRequestCode = requestCode;
+        setResult(mResultCode, null);
     }
 
     protected void setResult(int resultCode, Intent data) {
@@ -164,6 +165,7 @@ public class BaseFragment {
     }
 
     public void onDestroy() {
+        clearViews();
     }
 
     public void onOpenAnimationStart() {
@@ -176,10 +178,25 @@ public class BaseFragment {
     }
 
     public void onSaveInstanceState(Bundle outState) {
-
+        if (outState == null)
+            return;
+        outState.putInt("mRequestCode", mRequestCode);
+        if (mData != null)
+            outState.putBundle("mResultData", mData.getExtras());
+        if (mArguments != null)
+            outState.putBundle("mArguments", mArguments);
     }
 
     public void onRestoreInstanceState(Bundle savedInstanceState) {
+        if (savedInstanceState == null)
+            return;
+        mRequestCode = savedInstanceState.containsKey("mRequestCode") ? savedInstanceState.getInt("mRequestCode") : -1;
+        Bundle data = savedInstanceState.containsKey("mResultData") ? savedInstanceState.getBundle("mResultData") : null;
+        if (data != null) {
+            mData = new Intent();
+            mData.putExtras(data);
+        }
+        mArguments = savedInstanceState.containsKey("mArguments") ? savedInstanceState.getBundle("mArguments") : null;
     }
 
     public static BaseFragment instantiate(Context context, String fname, Bundle args) {
@@ -201,5 +218,8 @@ public class BaseFragment {
         } catch (IllegalAccessException e) {
         }
         return null;
+    }
+
+    public interface SingleInstance {
     }
 }

@@ -1,5 +1,6 @@
 package com.frameworkui;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.ActionBar;
@@ -19,9 +20,7 @@ public class MainFragment extends BaseFragment {
         mFragmentView.findViewById(R.id.button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ChatFragment chatFragment = new ChatFragment();
-//                chatFragment.setRequestCode(1111);
-                getBaseActivity().presentFragment(chatFragment, false, BaseActivity.TRANSLATION);
+                getBaseActivity().presentFragment(BaseActivity.FragmentType.CHAT, null, 1111, BaseActivity.TRANSLATION_WITH_FADE_IN);
             }
         });
         return mFragmentView;
@@ -31,28 +30,34 @@ public class MainFragment extends BaseFragment {
     public void onSetupActionBar() {
         super.onSetupActionBar();
         ActionBar actionBar = getBaseActivity().getSupportActionBar();
-        if(actionBar != null) {
+        if (actionBar != null) {
             actionBar.setTitle("Main Fragment");
         }
     }
 
-//    @Override
-//    public void onResume() {
-//        super.onResume();
-//        android.util.Log.d("ThoLH", "MainFragment onResume");
-//    }
-//
-//    @Override
-//    public void onPause() {
-//        super.onPause();
-//        android.util.Log.d("ThoLH", "MainFragment onPause");
-//    }
+    @Override
+    public void onResume() {
+        super.onResume();
+        android.util.Log.d("ThoLH", "MainFragment onResume");
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        android.util.Log.d("ThoLH", "MainFragment onPause");
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        android.util.Log.d("ThoLH", "MainFragment onDestroy");
+    }
 
     @Override
     public void onActivityResultFragment(int requestCode, int resultCode, Intent data) {
         super.onActivityResultFragment(requestCode, resultCode, data);
-        if(requestCode == 1111) {
-            Toast.makeText(getBaseActivity(), "Chat Fragment", Toast.LENGTH_LONG).show();
+        if (requestCode == 1111 && resultCode == Activity.RESULT_OK) {
+            Toast.makeText(getBaseActivity(), "Chat Fragment " + data.getExtras(), Toast.LENGTH_LONG).show();
         }
     }
 }
