@@ -1,6 +1,7 @@
 package com.frameworkui;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
@@ -28,8 +29,9 @@ public class BaseActivity extends AppCompatActivity {
     private ViewGroup mContainerView;
     private ArrayList<FragmentItem> mFragmentStack = null;
     private int mSingleInstanceFragmentIndex = -1;
-    private boolean isCreating = false;
+    private volatile boolean isCreating = false, isShowingFragment = false, isPoppingStack = false;
     private Bundle mSavedInstanceState = null;
+    private Handler mHandler = new Handler();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,29 +84,114 @@ public class BaseActivity extends AppCompatActivity {
         }
     }
 
+    public boolean presentFragment(FragmentType fragmentType, Bundle arguments) {
+        return presentFragment(fragmentType, arguments, -1, FADE_IN);
+    }
+
     public boolean presentFragment(FragmentType fragmentType, Bundle arguments, int requestCode, int animationType) {
+        return presentFragment(fragmentType, arguments, requestCode, animationType, false);
+    }
+
+    public boolean presentFragment(FragmentType fragmentType, Bundle arguments, int requestCode, int animationType, final boolean removeLast) {
         try {
+            if (isShowingFragment) return true;
+            isShowingFragment = true;
             if (arguments == null) {
                 arguments = new Bundle();
             }
+            boolean allowClearTopFromSingleInstance = getResources().getBoolean(R.bool.clear_top_from_single_instance_item);
+            boolean hasSingleInstanceItem = false;
             FragmentItem fragmentItem = null;
             if (mSingleInstanceFragmentIndex > -1 && mSingleInstanceFragmentIndex < mFragmentStack.size()) {
-                fragmentItem = mFragmentStack.get(mSingleInstanceFragmentIndex);
-                mFragmentStack.remove(mSingleInstanceFragmentIndex);
-                mSingleInstanceFragmentIndex = mFragmentStack.size();
+                //TODO: handle single instance case
+                if (fragmentType.getTypeId() == mFragmentStack.get(mSingleInstanceFragmentIndex).fragmentType.getTypeId()) {
+                    fragmentItem = mFragmentStack.get(mSingleInstanceFragmentIndex);
+                    if (allowClearTopFromSingleInstance) {
+                        hasSingleInstanceItem = true;
+                    } else {
+                        mFragmentStack.remove(mSingleInstanceFragmentIndex);
+                        mSingleInstanceFragmentIndex = mFragmentStack.size();
+                    }
+                }
             }
             if (fragmentItem == null) {
                 fragmentItem = new FragmentItem(fragmentType, arguments);
                 fragmentItem.fragment = fragmentType.getFragmentClass().newInstance();
                 if (BaseFragment.SingleInstance.class.isInstance(fragmentItem.fragment)) {
                     mSingleInstanceFragmentIndex = mFragmentStack.size();
-                    //TODO: handle single instance case
                 }
             }
             fragmentItem.fragment.setArguments(arguments);
-            if (requestCode > 0)
+            if (requestCode > 0 && !hasSingleInstanceItem)
                 fragmentItem.fragment.setRequestCode(requestCode);
-            presentFragment(fragmentItem, false, animationType);
+
+            boolean needAnimation = animationType != NO_ANIMATION && getResources().getBoolean(R.bool.use_view_animation);
+            final BaseFragment fragment = fragmentItem.fragment;
+            fragment.setBaseActivity(this);
+            View fragmentView = fragment.mFragmentView;
+
+            if (fragmentView == null) {
+                fragmentView = fragment.onCreateView(this, mContainerView);
+            } else {
+                ViewGroup parent = (ViewGroup) fragmentView.getParent();
+                if (parent != null) {
+                    parent.removeView(fragmentView);
+                }
+            }
+            mContainerView.addView(fragmentView);
+            ViewGroup.LayoutParams layoutParams = fragmentView.getLayoutParams();
+            layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT;
+            layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT;
+            fragmentView.setLayoutParams(layoutParams);
+            fragmentView.bringToFront();
+
+            final FragmentItem currentFragmentItem = hasSingleInstanceItem ? null : !(mFragmentStack == null || mFragmentStack.isEmpty()) ? mFragmentStack.get(mFragmentStack.size() - 1) : null;
+            if (!hasSingleInstanceItem) {
+                //Add to back stack
+                mFragmentStack.add(fragmentItem);
+            }
+            fragment.onResume();
+            fragment.onSetupActionBar();
+
+            if (!needAnimation) {
+                if (hasSingleInstanceItem) {
+                    //Clear top from single instance item
+                    for (int i = mSingleInstanceFragmentIndex + 1; i < mFragmentStack.size(); i++) {
+                        removeFragmentFromStack(mFragmentStack.get(i));
+                        i--;
+                    }
+                } else {
+                    presentFragmentInternalRemoveOld(removeLast, currentFragmentItem);
+                }
+            } else {
+                fragment.onOpenAnimationStart();
+                final boolean needClearTop = hasSingleInstanceItem;
+                presentFragmentInternalWithAnimation(fragment, animationType, new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        super.onAnimationEnd(animation);
+                        if (needClearTop) {
+                            //Clear top from single instance item
+                            for (int i = mSingleInstanceFragmentIndex + 1; i < mFragmentStack.size(); i++) {
+                                removeFragmentFromStack(mFragmentStack.get(i));
+                                i--;
+                            }
+                        } else {
+                            presentFragmentInternalRemoveOld(removeLast, currentFragmentItem);
+                        }
+                        fragment.onOpenAnimationEnd();
+                        fragment.onBecomeFullyVisible();
+                    }
+
+                    @Override
+                    public void onAnimationCancel(Animator animation) {
+                        super.onAnimationCancel(animation);
+                        presentFragmentInternalRemoveOld(removeLast, currentFragmentItem);
+                        fragment.onOpenAnimationEnd();
+                        fragment.onBecomeFullyVisible();
+                    }
+                });
+            }
             return true;
         } catch (InstantiationException e) {
             e.printStackTrace();
@@ -112,59 +199,6 @@ public class BaseActivity extends AppCompatActivity {
             e.printStackTrace();
         }
         return false;
-    }
-
-    private boolean presentFragment(FragmentItem fragmentItem, final boolean removeLast, int animationType) {
-        boolean needAnimation = animationType != NO_ANIMATION && getResources().getBoolean(R.bool.use_view_animation);
-        final FragmentItem currentFragmentItem = !(mFragmentStack == null || mFragmentStack.isEmpty()) ? mFragmentStack.get(mFragmentStack.size() - 1) : null;
-//        BaseFragment currentFragment = currentFragmentItem != null ? currentFragmentItem.fragment : null;
-        final BaseFragment fragment = fragmentItem.fragment;
-        fragment.setBaseActivity(this);
-        View fragmentView = fragment.mFragmentView;
-        if (fragmentView == null) {
-            fragmentView = fragment.onCreateView(this, mContainerView);
-        } else {
-            ViewGroup parent = (ViewGroup) fragmentView.getParent();
-            if (parent != null) {
-                parent.removeView(fragmentView);
-            }
-        }
-        mContainerView.addView(fragmentView);
-        ViewGroup.LayoutParams layoutParams = fragmentView.getLayoutParams();
-        layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT;
-        layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT;
-        fragmentView.setLayoutParams(layoutParams);
-
-        //Add to back stack
-        mFragmentStack.add(fragmentItem);
-
-        fragment.onResume();
-        fragmentView.bringToFront();
-        fragment.onSetupActionBar();
-
-        if (!needAnimation) {
-            presentFragmentInternalRemoveOld(removeLast, currentFragmentItem);
-        } else {
-            fragment.onOpenAnimationStart();
-            presentFragmentInternalWithAnimation(fragment, animationType, new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    super.onAnimationEnd(animation);
-                    presentFragmentInternalRemoveOld(removeLast, currentFragmentItem);
-                    fragment.onOpenAnimationEnd();
-                    fragment.onBecomeFullyVisible();
-                }
-
-                @Override
-                public void onAnimationCancel(Animator animation) {
-                    super.onAnimationCancel(animation);
-                    presentFragmentInternalRemoveOld(removeLast, currentFragmentItem);
-                    fragment.onOpenAnimationEnd();
-                    fragment.onBecomeFullyVisible();
-                }
-            });
-        }
-        return true;
     }
 
     private void presentFragmentInternalWithAnimation(BaseFragment fragment, int animationType, Animator.AnimatorListener animatorListener) {
@@ -189,6 +223,7 @@ public class BaseActivity extends AppCompatActivity {
 
     private void presentFragmentInternalRemoveOld(boolean removeLast, final FragmentItem fragmentItem) {
         if (fragmentItem == null || fragmentItem.fragment == null) {
+            isShowingFragment = false;
             return;
         }
         fragmentItem.fragment.onPause();
@@ -203,6 +238,12 @@ public class BaseActivity extends AppCompatActivity {
                 parent.removeView(fragmentItem.fragment.mFragmentView);
             }
         }
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                isShowingFragment = false;
+            }
+        }, 200);
     }
 
 //    public boolean addFragmentToStack(BaseFragment baseFragment, int position) {
@@ -295,8 +336,11 @@ public class BaseActivity extends AppCompatActivity {
     public boolean popBackStack(boolean animated) {
         if (mFragmentStack == null || mFragmentStack.isEmpty() || mFragmentStack.size() == 1)
             return false;
-        BaseFragment currentFragment = mFragmentStack.get(mFragmentStack.size() - 1).getFragment();
-        removeFragmentFromStack(mFragmentStack.get(mFragmentStack.size() - 1));
+        if (isPoppingStack) return true;
+        isPoppingStack = true;
+        FragmentItem fragmentItem = mFragmentStack.get(mFragmentStack.size() - 1);
+        BaseFragment currentFragment = fragmentItem.getFragment();
+        fragmentItem.fragment.onPause();
         View fragmentView = currentFragment.mFragmentView;
         if (fragmentView != null) {
             ViewGroup parent = (ViewGroup) fragmentView.getParent();
@@ -304,11 +348,23 @@ public class BaseActivity extends AppCompatActivity {
                 parent.removeView(fragmentView);
             }
         }
+        //TODO: check single instance before destroy fragment
+        if (!BaseFragment.SingleInstance.class.isInstance(fragmentItem.fragment)) {
+            fragmentItem.fragment.onDestroy();
+        }
+        fragmentItem.fragment.setBaseActivity(null);
+        mFragmentStack.remove(fragmentItem);
         showLastFragment(mSavedInstanceState);
         if (currentFragment.mRequestCode >= 0) {
             BaseFragment lastFragment = mFragmentStack.get(mFragmentStack.size() - 1).getFragment();
             lastFragment.onActivityResultFragment(currentFragment.mRequestCode, currentFragment.mResultCode, currentFragment.mData);
         }
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                isPoppingStack = false;
+            }
+        }, 200);
         return true;
     }
 

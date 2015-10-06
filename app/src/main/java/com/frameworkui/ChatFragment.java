@@ -11,7 +11,7 @@ import android.view.ViewGroup;
 /**
  * Created by ThoLH on 10/05/2015.
  */
-public class ChatFragment extends BaseFragment {
+public class ChatFragment extends BaseFragment implements BaseFragment.SingleInstance {
     @Override
     public View onCreateView(Context context, ViewGroup container) {
         mFragmentView = LayoutInflater.from(context).inflate(R.layout.chat_fragment, container, false);

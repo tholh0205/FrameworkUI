@@ -15,6 +15,12 @@ public class ProfileFragment extends BaseFragment {
     @Override
     public View onCreateView(Context context, ViewGroup container) {
         mFragmentView = LayoutInflater.from(context).inflate(R.layout.profile_fragment, container, false);
+        mFragmentView.findViewById(R.id.button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getBaseActivity().presentFragment(BaseActivity.FragmentType.CHAT, null, 2222, BaseActivity.TRANSLATION_WITH_FADE_IN);
+            }
+        });
         return mFragmentView;
     }
 

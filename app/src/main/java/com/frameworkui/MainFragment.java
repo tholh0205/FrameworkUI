@@ -20,7 +20,7 @@ public class MainFragment extends BaseFragment {
         mFragmentView.findViewById(R.id.button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getBaseActivity().presentFragment(BaseActivity.FragmentType.CHAT, null, 1111, BaseActivity.TRANSLATION_WITH_FADE_IN);
+                getBaseActivity().presentFragment(BaseActivity.FragmentType.PROFILE, null, 1111, BaseActivity.TRANSLATION_WITH_FADE_IN);
             }
         });
         return mFragmentView;
