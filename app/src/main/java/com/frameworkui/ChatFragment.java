@@ -18,7 +18,8 @@ public class ChatFragment extends BaseFragment implements BaseFragment.SingleIns
         mFragmentView.findViewById(R.id.button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                getBaseActivity().presentFragment(BaseActivity.FragmentType.PROFILE, null, -1, BaseActivity.TRANSLATION_WITH_FADE_IN);
+//                getBaseActivity().presentFragment(BaseActivity.FragmentType.PROFILE, null, -1, BaseActivity.TRANSLATION_WITH_FADE_IN);
+                getActivity().getFragmentManagerLayout().showFragment(FragmentData.FragmentType.PROFILE, null, 0, false, false);
             }
         });
         return mFragmentView;
@@ -27,7 +28,7 @@ public class ChatFragment extends BaseFragment implements BaseFragment.SingleIns
     @Override
     public void onSetupActionBar() {
         super.onSetupActionBar();
-        ActionBar actionBar = getBaseActivity().getSupportActionBar();
+        ActionBar actionBar = getActivity().getSupportActionBar();
         if (actionBar != null) {
             setTitle("Chat Fragment");
             actionBar.setDisplayHomeAsUpEnabled(true);

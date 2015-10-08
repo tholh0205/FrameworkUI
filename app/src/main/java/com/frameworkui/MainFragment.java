@@ -20,7 +20,8 @@ public class MainFragment extends BaseFragment {
         mFragmentView.findViewById(R.id.button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getBaseActivity().presentFragment(BaseActivity.FragmentType.PROFILE, null, 1111, BaseActivity.TRANSLATION_WITH_FADE_IN);
+//                getBaseActivity().presentFragment(BaseActivity.FragmentType.PROFILE, null, 1111, BaseActivity.TRANSLATION_WITH_FADE_IN);
+                getActivity().getFragmentManagerLayout().showFragment(FragmentData.FragmentType.CHAT, null, 0, false, false);
             }
         });
         return mFragmentView;
@@ -29,7 +30,7 @@ public class MainFragment extends BaseFragment {
     @Override
     public void onSetupActionBar() {
         super.onSetupActionBar();
-        ActionBar actionBar = getBaseActivity().getSupportActionBar();
+        ActionBar actionBar = getActivity().getSupportActionBar();
         if (actionBar != null) {
             actionBar.setTitle("Main Fragment");
         }
@@ -57,7 +58,7 @@ public class MainFragment extends BaseFragment {
     public void onActivityResultFragment(int requestCode, int resultCode, Intent data) {
         super.onActivityResultFragment(requestCode, resultCode, data);
         if (requestCode == 1111 && resultCode == Activity.RESULT_OK) {
-            Toast.makeText(getBaseActivity(), "Chat Fragment " + data.getExtras(), Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(), "Chat Fragment " + data.getExtras(), Toast.LENGTH_LONG).show();
         }
     }
 }

@@ -13,6 +13,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
+import android.view.animation.Animation;
 
 import java.util.HashMap;
 
@@ -20,17 +21,14 @@ import java.util.HashMap;
  * Created by ThoLH on 10/02/2015.
  */
 public class BaseFragment {
-    private static final HashMap<String, Class<?>> sClassMap =
-            new HashMap<String, Class<?>>();
 
     private boolean isFinished = false;
     public View mFragmentView = null;
     private Toolbar mToolbar = null;
     protected Bundle mArguments = null;
-    private BaseActivity mBaseActivity = null;
+    private BaseFragmentActivity mBaseActivity = null;
 
     //Fragment Result Data
-    public int mRequestCode = -1;
     public int mResultCode = Activity.RESULT_CANCELED;
     public Intent mData = null;
 
@@ -41,16 +39,16 @@ public class BaseFragment {
         this.mArguments = arguments;
     }
 
-    public BaseFragment(BaseActivity baseActivity, Bundle arguments) {
+    public BaseFragment(BaseFragmentActivity baseActivity, Bundle arguments) {
         this.mBaseActivity = baseActivity;
         this.mArguments = arguments;
     }
 
-    public void setBaseActivity(BaseActivity baseActivity) {
+    public void setActivity(BaseFragmentActivity baseActivity) {
         this.mBaseActivity = baseActivity;
     }
 
-    public BaseActivity getBaseActivity() {
+    public BaseFragmentActivity getActivity() {
         return mBaseActivity;
     }
 
@@ -74,13 +72,14 @@ public class BaseFragment {
             mBaseActivity.setSupportActionBar(mToolbar);
             ActionBar actionBar = mBaseActivity.getSupportActionBar();
             if (actionBar != null) {
+                actionBar.setDisplayHomeAsUpEnabled(true);
                 actionBar.setHomeAsUpIndicator(getUpIndicator());
             }
         }
     }
 
     protected Drawable getUpIndicator() {
-        Drawable up = getBaseActivity().getResources().getDrawable(android.support.v7.appcompat.R.drawable.abc_ic_ab_back_mtrl_am_alpha);
+        Drawable up = getActivity().getResources().getDrawable(android.support.v7.appcompat.R.drawable.abc_ic_ab_back_mtrl_am_alpha);
         up.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_IN);
         return up;
     }
@@ -116,6 +115,10 @@ public class BaseFragment {
         return null;
     }
 
+    public void onViewCreated(View view) {
+        this.mFragmentView = view;
+    }
+
     protected void clearViews() {
         if (mFragmentView != null) {
             ViewParent parent = mFragmentView.getParent();
@@ -131,19 +134,14 @@ public class BaseFragment {
     }
 
     public boolean finishFragment(boolean animated) {
-        if (mBaseActivity != null) {
-            return mBaseActivity.popBackStack(animated);
-        }
+//        if (mBaseActivity != null) {
+//            return mBaseActivity.popBackStack(animated);
+//        }
         return false;
     }
 
     public boolean onBackPressed() {
         return finishFragment(false);
-    }
-
-    public void setRequestCode(int requestCode) {
-        this.mRequestCode = requestCode;
-        setResult(mResultCode, null);
     }
 
     protected void setResult(int resultCode, Intent data) {
@@ -174,13 +172,9 @@ public class BaseFragment {
     public void onOpenAnimationEnd() {
     }
 
-    public void onBecomeFullyVisible() {
-    }
-
     public void onSaveInstanceState(Bundle outState) {
         if (outState == null)
             return;
-        outState.putInt("mRequestCode", mRequestCode);
         if (mData != null)
             outState.putBundle("mResultData", mData.getExtras());
         if (mArguments != null)
@@ -190,34 +184,12 @@ public class BaseFragment {
     public void onRestoreInstanceState(Bundle savedInstanceState) {
         if (savedInstanceState == null)
             return;
-        mRequestCode = savedInstanceState.containsKey("mRequestCode") ? savedInstanceState.getInt("mRequestCode") : -1;
         Bundle data = savedInstanceState.containsKey("mResultData") ? savedInstanceState.getBundle("mResultData") : null;
         if (data != null) {
             mData = new Intent();
             mData.putExtras(data);
         }
         mArguments = savedInstanceState.containsKey("mArguments") ? savedInstanceState.getBundle("mArguments") : null;
-    }
-
-    public static BaseFragment instantiate(Context context, String fname, Bundle args) {
-        try {
-            Class<?> clazz = sClassMap.get(fname);
-            if (clazz == null) {
-                // Class not found in the cache, see if it's real, and try to add it
-                clazz = context.getClassLoader().loadClass(fname);
-                sClassMap.put(fname, clazz);
-            }
-            BaseFragment f = (BaseFragment) clazz.newInstance();
-            if (args != null) {
-                args.setClassLoader(f.getClass().getClassLoader());
-                f.mArguments = args;
-            }
-            return f;
-        } catch (ClassNotFoundException e) {
-        } catch (java.lang.InstantiationException e) {
-        } catch (IllegalAccessException e) {
-        }
-        return null;
     }
 
     public interface SingleInstance {

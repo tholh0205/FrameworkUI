@@ -18,7 +18,7 @@ public class ProfileFragment extends BaseFragment {
         mFragmentView.findViewById(R.id.button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                getBaseActivity().presentFragment(BaseActivity.FragmentType.CHAT, null, 2222, BaseActivity.TRANSLATION_WITH_FADE_IN);
+                //getBaseActivity().presentFragment(BaseActivity.FragmentType.CHAT, null, 2222, BaseActivity.TRANSLATION_WITH_FADE_IN);
             }
         });
         return mFragmentView;
@@ -27,7 +27,7 @@ public class ProfileFragment extends BaseFragment {
     @Override
     public void onSetupActionBar() {
         super.onSetupActionBar();
-        ActionBar actionBar = getBaseActivity().getSupportActionBar();
+        ActionBar actionBar = getActivity().getSupportActionBar();
         if (actionBar != null) {
             setTitle("Profile Fragment");
             actionBar.setDisplayHomeAsUpEnabled(true);
