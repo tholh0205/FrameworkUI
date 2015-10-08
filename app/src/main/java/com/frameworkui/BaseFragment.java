@@ -134,14 +134,15 @@ public class BaseFragment {
     }
 
     public boolean finishFragment(boolean animated) {
-//        if (mBaseActivity != null) {
-//            return mBaseActivity.popBackStack(animated);
-//        }
+        if (mBaseActivity != null && mBaseActivity.getFragmentManagerLayout() != null) {
+            return mBaseActivity.getFragmentManagerLayout().goToBackStack(animated);
+        }
         return false;
     }
 
     public boolean onBackPressed() {
-        return finishFragment(false);
+//        return finishFragment(false);
+        return false;
     }
 
     protected void setResult(int resultCode, Intent data) {

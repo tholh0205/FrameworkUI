@@ -1,6 +1,7 @@
 package com.frameworkui;
 
 import android.view.View;
+import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 
 import com.nineoldandroids.animation.Animator;
@@ -58,7 +59,7 @@ public class FragmentAnimationUtils {
         sCurrentAnimatorSet.playTogether(animators);
         sCurrentAnimatorSet.addListener(animatorListener);
         sCurrentAnimatorSet.setDuration(300L);
-        sCurrentAnimatorSet.setInterpolator(new DecelerateInterpolator(1.5F));
+        sCurrentAnimatorSet.setInterpolator(new AccelerateInterpolator(1.5F));
         sCurrentAnimatorSet.start();
     }
 

@@ -44,9 +44,9 @@ public class FragmentData {
 
         public final Class<? extends BaseFragment> cls;
         public BaseFragment mFragment;
-        private final Bundle mData = new Bundle();
+        public final Bundle mData = new Bundle();
         public int mRequestCode = -1;
-        private final FragmentType mFragmentType;
+        public final FragmentType mFragmentType;
 
         private int mAnimationEnter, mAnimationExit;
 

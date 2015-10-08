@@ -19,6 +19,7 @@ public class ProfileFragment extends BaseFragment {
             @Override
             public void onClick(View view) {
                 //getBaseActivity().presentFragment(BaseActivity.FragmentType.CHAT, null, 2222, BaseActivity.TRANSLATION_WITH_FADE_IN);
+                getActivity().getFragmentManagerLayout().showFragment(FragmentData.FragmentType.CHAT, null, 0, false, false);
             }
         });
         return mFragmentView;

@@ -21,7 +21,7 @@ public class MainFragment extends BaseFragment {
             @Override
             public void onClick(View v) {
 //                getBaseActivity().presentFragment(BaseActivity.FragmentType.PROFILE, null, 1111, BaseActivity.TRANSLATION_WITH_FADE_IN);
-                getActivity().getFragmentManagerLayout().showFragment(FragmentData.FragmentType.CHAT, null, 0, false, false);
+                getActivity().getFragmentManagerLayout().showFragment(FragmentData.FragmentType.CHAT, null, 1111, false, false);
             }
         });
         return mFragmentView;
