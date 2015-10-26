@@ -3,8 +3,12 @@ package com.frameworkui;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -12,8 +16,11 @@ import android.view.ViewGroup;
  * Created by ThoLH on 10/05/2015.
  */
 public class ChatFragment extends BaseFragment implements BaseFragment.SingleInstance {
+
+
     @Override
     public View onCreateView(Context context, ViewGroup container) {
+        setHasMenu(true);
         mFragmentView = LayoutInflater.from(context).inflate(R.layout.chat_fragment, container, false);
         mFragmentView.findViewById(R.id.button).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -22,6 +29,7 @@ public class ChatFragment extends BaseFragment implements BaseFragment.SingleIns
                 getActivity().getFragmentManagerLayout().showFragment(FragmentData.FragmentType.PROFILE, null, 0, false, false);
             }
         });
+        android.util.Log.d("ThoLH", " ChatFragment get key MainFragment = " + getArguments().getString("MainFragment"));
         return mFragmentView;
     }
 
@@ -33,6 +41,15 @@ public class ChatFragment extends BaseFragment implements BaseFragment.SingleIns
             setTitle("Chat Fragment");
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+//        super.onCreateOptionsMenu(menu, inflater);
+        menu.clear();
+        inflater.inflate(R.menu.chat_menu, menu);
+        MenuItem itemMore = menu.findItem(R.id.menu_more);
+        itemMore.setIcon(getMenuMoreDrawable());
     }
 
     @Override
@@ -61,4 +78,8 @@ public class ChatFragment extends BaseFragment implements BaseFragment.SingleIns
         android.util.Log.d("ThoLH", "ChatFragment onDestroy");
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+    }
 }

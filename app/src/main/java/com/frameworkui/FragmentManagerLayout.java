@@ -7,6 +7,9 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.AttributeSet;
 import android.view.Gravity;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,6 +30,7 @@ public class FragmentManagerLayout extends FrameLayout {
     private ArrayList<FragmentData.FragmentItem> mFragmentStack = new ArrayList<>();
 
     private LinearLayout mContainerViewBack, mContainerView;
+    private Bundle mSavedInstanceState;
 
     public FragmentManagerLayout(Context context) {
         super(context);
@@ -128,7 +132,7 @@ public class FragmentManagerLayout extends FrameLayout {
         //includeLast ? 0 : 1
     }
 
-    public void showFragment(FragmentData.FragmentType fragmentType, Bundle data, int requestCode, boolean noAnimation, final boolean removelast) {
+    public void showFragment(FragmentData.FragmentType fragmentType, Bundle data, int requestCode, boolean noAnimation, final boolean removeLast) {
         try {
             if (FragmentAnimationUtils.isRunning())
                 return;
@@ -158,7 +162,11 @@ public class FragmentManagerLayout extends FrameLayout {
             }
             if (fragmentItem.getFragment() == null) {
                 fragmentItem.mFragment = fragmentType.getFragmentClass().newInstance();
+                fragmentItem.mFragment.onCreate(mSavedInstanceState);
+                fragmentItem.mFragment.onActivityCreated(mSavedInstanceState);
             }
+            final boolean isKeepBelowItem = BaseFragment.KeepBelowFragment.class.isInstance(fragmentItem.getFragment());
+
             fragmentItem.mFragment.setArguments(data);
 
 //            if (requestCode > 0) {
@@ -168,6 +176,14 @@ public class FragmentManagerLayout extends FrameLayout {
             View fragmentView = fragmentItem.getFragment().mFragmentView;
             if (fragmentView == null) {
                 fragmentView = fragmentItem.mFragment.onCreateView(getContext(), null);
+                if (isKeepBelowItem) {
+                    fragmentView.setOnClickListener(new OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+
+                        }
+                    });
+                }
                 fragmentItem.mFragment.onViewCreated(fragmentView);
             } else {
                 ViewGroup parent = (ViewGroup) fragmentView.getParent();
@@ -176,6 +192,7 @@ public class FragmentManagerLayout extends FrameLayout {
                 }
             }
             mContainerViewBack.addView(fragmentView);
+            fragmentItem.mFragment.onAttach(getBaseActivity());
             LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) fragmentView.getLayoutParams();
             layoutParams.width = LinearLayout.LayoutParams.MATCH_PARENT;
             layoutParams.height = LinearLayout.LayoutParams.MATCH_PARENT;
@@ -190,10 +207,12 @@ public class FragmentManagerLayout extends FrameLayout {
             bringChildToFront(mContainerView);
 
             if (!needAnimation || currentFragmentItem == null) {
-                if (isSingleItem) {
-                    showFragmentInternalRemoveFromSingleInstance(fragmentItem);
-                } else {
-                    showFragmentInternalRemoveOld(removelast, currentFragmentItem);
+                if (!isKeepBelowItem) {
+                    if (isSingleItem) {
+                        showFragmentInternalRemoveFromSingleInstance(fragmentItem);
+                    } else {
+                        showFragmentInternalRemoveOld(removeLast, currentFragmentItem);
+                    }
                 }
                 fragmentItem.getFragment().onOpenAnimationStart();
                 fragmentItem.getFragment().onOpenAnimationEnd();
@@ -205,10 +224,12 @@ public class FragmentManagerLayout extends FrameLayout {
                     @Override
                     public void onAnimationCancel(Animator animation) {
                         super.onAnimationCancel(animation);
-                        if (singleFragmentItem != null) {
-                            showFragmentInternalRemoveFromSingleInstance(singleFragmentItem);
-                        } else {
-                            showFragmentInternalRemoveOld(removelast, currentFragmentItem);
+                        if (!isKeepBelowItem) {
+                            if (singleFragmentItem != null) {
+                                showFragmentInternalRemoveFromSingleInstance(singleFragmentItem);
+                            } else {
+                                showFragmentInternalRemoveOld(removeLast, currentFragmentItem);
+                            }
                         }
                         fragment.onOpenAnimationEnd();
                     }
@@ -216,10 +237,12 @@ public class FragmentManagerLayout extends FrameLayout {
                     @Override
                     public void onAnimationEnd(Animator animation) {
                         super.onAnimationEnd(animation);
-                        if (singleFragmentItem != null) {
-                            showFragmentInternalRemoveFromSingleInstance(singleFragmentItem);
-                        } else {
-                            showFragmentInternalRemoveOld(removelast, currentFragmentItem);
+                        if (!isKeepBelowItem) {
+                            if (singleFragmentItem != null) {
+                                showFragmentInternalRemoveFromSingleInstance(singleFragmentItem);
+                            } else {
+                                showFragmentInternalRemoveOld(removeLast, currentFragmentItem);
+                            }
                         }
                         fragment.onOpenAnimationEnd();
                     }
@@ -240,6 +263,7 @@ public class FragmentManagerLayout extends FrameLayout {
         if (index > 0 && index < mFragmentStack.size() - 1) {
             for (int i = index + 1; i < mFragmentStack.size(); i++) {
                 showFragmentInternalRemoveOld(true, mFragmentStack.get(i));
+                i--;
             }
         }
     }
@@ -250,6 +274,13 @@ public class FragmentManagerLayout extends FrameLayout {
         }
         BaseFragment fragment = fragmentItem.getFragment();
         fragment.onPause();
+        MainApplication.getInstance().runOnUIThread(new Runnable() {
+            @Override
+            public void run() {
+                if (getBaseActivity() != null)
+                    getBaseActivity().supportInvalidateOptionsMenu();
+            }
+        });
         if (removeLastFromStack) {
             fragment.onDestroy();
             fragment.setActivity(null);
@@ -259,6 +290,7 @@ public class FragmentManagerLayout extends FrameLayout {
                 ViewGroup parent = (ViewGroup) fragment.mFragmentView.getParent();
                 if (parent != null) {
                     parent.removeView(fragment.mFragmentView);
+                    fragment.onDetach();
                 }
             }
         }
@@ -271,6 +303,8 @@ public class FragmentManagerLayout extends FrameLayout {
             final FragmentData.FragmentItem fragmentItem = mFragmentStack.isEmpty() ? null : mFragmentStack.get(mFragmentStack.size() - 1);
             if (fragmentItem.getFragment() == null) {
                 fragmentItem.mFragment = fragmentItem.cls.newInstance();
+                fragmentItem.mFragment.onCreate(mSavedInstanceState);
+                fragmentItem.mFragment.onActivityCreated(mSavedInstanceState);
             }
             fragmentItem.mFragment.setArguments(fragmentItem.mData);
 
@@ -286,6 +320,7 @@ public class FragmentManagerLayout extends FrameLayout {
                 }
             }
             mContainerViewBack.addView(fragmentView);
+            fragmentItem.mFragment.onAttach(getBaseActivity());
             LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) fragmentView.getLayoutParams();
             layoutParams.width = LinearLayout.LayoutParams.MATCH_PARENT;
             layoutParams.height = LinearLayout.LayoutParams.MATCH_PARENT;
@@ -332,11 +367,14 @@ public class FragmentManagerLayout extends FrameLayout {
                 if (belowFragmentItem.mFragment == null) {
                     belowFragmentItem.mFragment = belowFragmentItem.cls.newInstance();
                     belowFragmentItem.mFragment.setArguments(belowFragmentItem.mData);
+                    belowFragmentItem.mFragment.onCreate(mSavedInstanceState);
+                    belowFragmentItem.mFragment.onActivityCreated(mSavedInstanceState);
                 }
 
                 belowFragmentItem.mFragment.setActivity(getBaseActivity());
                 View fragmentView = belowFragmentItem.getFragment().mFragmentView;
                 if (fragmentView == null) {
+                    android.util.Log.d("ThoLH", "goToBackStack belowFragment fragmentView == null");
                     fragmentView = belowFragmentItem.getFragment().onCreateView(getContext(), null);
                     belowFragmentItem.getFragment().onViewCreated(fragmentView);
                 } else {
@@ -346,6 +384,7 @@ public class FragmentManagerLayout extends FrameLayout {
                     }
                 }
                 mContainerView.addView(fragmentView);
+                belowFragmentItem.mFragment.onAttach(getBaseActivity());
                 LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) fragmentView.getLayoutParams();
                 layoutParams.width = LinearLayout.LayoutParams.MATCH_PARENT;
                 layoutParams.height = LinearLayout.LayoutParams.MATCH_PARENT;
@@ -387,18 +426,27 @@ public class FragmentManagerLayout extends FrameLayout {
     private void closeLastFragmentInternalRemoveOld(FragmentData.FragmentItem fragmentItem) {
         BaseFragment fragment = fragmentItem.getFragment();
         fragment.onPause();
+        MainApplication.getInstance().runOnUIThread(new Runnable() {
+            @Override
+            public void run() {
+                if (getBaseActivity() != null)
+                    getBaseActivity().supportInvalidateOptionsMenu();
+            }
+        });
         if (!BaseFragment.SingleInstance.class.isInstance(fragment)) {
             fragment.onDestroy();
         } else {
             ViewGroup parent = (ViewGroup) fragment.mFragmentView.getParent();
             if (parent != null) {
                 parent.removeView(fragment.mFragmentView);
+                fragment.onDetach();
             }
         }
         fragment.setActivity(null);
         mFragmentStack.remove(fragmentItem);
         mContainerViewBack.setVisibility(View.GONE);
         bringChildToFront(mContainerView);
+        mContainerViewBack.removeAllViews();
         resetAnimationCheck(false);
         if (fragmentItem.mRequestCode > 0) {
             onActivityResultFragment(fragmentItem.mRequestCode, fragment.mResultCode, fragment.mData);
@@ -426,6 +474,37 @@ public class FragmentManagerLayout extends FrameLayout {
         ViewHelper.setScaleY(mContainerViewBack, 1f);
         ViewHelper.setTranslationX(mContainerViewBack, 0f);
         ViewHelper.setTranslationY(mContainerViewBack, 0f);
+    }
+
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        if (!mFragmentStack.isEmpty()) {
+            if (mFragmentStack.get(mFragmentStack.size() - 1).getFragment().hasMenu) {
+                mFragmentStack.get(mFragmentStack.size() - 1).getFragment().onCreateOptionsMenu(menu, inflater);
+            }
+        }
+    }
+
+    public boolean onOptionItemSelected(MenuItem item) {
+        if (!mFragmentStack.isEmpty()) {
+            if (mFragmentStack.get(mFragmentStack.size() - 1).getFragment().onOptionItemSelected(item)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void onSaveInstanceState(Bundle outState) {
+        if (!mFragmentStack.isEmpty()) {
+            for (FragmentData.FragmentItem fragmentItem : mFragmentStack) {
+                if (fragmentItem.getFragment() != null) {
+                    fragmentItem.getFragment().onSaveInstanceState(outState);
+                }
+            }
+        }
+    }
+
+    public void setSavedInstanceState(Bundle savedInstanceState) {
+        this.mSavedInstanceState = savedInstanceState;
     }
 
 }

@@ -12,7 +12,9 @@ public class FragmentData {
     public enum FragmentType {
         MAIN(1, MainFragment.class),
         CHAT(2, ChatFragment.class),
-        PROFILE(3, ProfileFragment.class);
+        PROFILE(3, ProfileFragment.class),
+        GALLERY(4, GalleryFragment.class),
+        SEARCH(5, SearchFragment.class);
 
         private int typeId;
         private Class<? extends BaseFragment> cls;

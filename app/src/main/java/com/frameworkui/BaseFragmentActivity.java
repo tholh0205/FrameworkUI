@@ -2,6 +2,8 @@ package com.frameworkui;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import java.util.ArrayList;
 
@@ -23,6 +25,7 @@ public class BaseFragmentActivity extends AppCompatActivity {
         mFragmentManager = new FragmentManagerLayout(this);
         setContentView(mFragmentManager);
         if (savedInstanceState != null) {
+            mFragmentManager.setSavedInstanceState(savedInstanceState);
             if (savedInstanceState.containsKey(SAVED_FRAGMENT_STACK)) {
                 ArrayList<FragmentData.FragmentItem> data = savedInstanceState.getParcelableArrayList(SAVED_FRAGMENT_STACK);
                 mFragmentManager.init(data);
@@ -32,7 +35,6 @@ public class BaseFragmentActivity extends AppCompatActivity {
         } else {
             mFragmentManager.init(null);
         }
-
     }
 
     public FragmentManagerLayout getFragmentManagerLayout() {
@@ -76,7 +78,24 @@ public class BaseFragmentActivity extends AppCompatActivity {
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        outState.putParcelableArrayList(SAVED_FRAGMENT_STACK, getFragmentManagerLayout().getFragmentStack());
         super.onSaveInstanceState(outState);
+        outState.putParcelableArrayList(SAVED_FRAGMENT_STACK, getFragmentManagerLayout().getFragmentStack());
+        getFragmentManagerLayout().onSaveInstanceState(outState);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        if (getFragmentManagerLayout() != null) {
+            getFragmentManagerLayout().onCreateOptionsMenu(menu, getMenuInflater());
+        }
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (getFragmentManagerLayout() != null) {
+            getFragmentManagerLayout().onOptionItemSelected(item);
+        }
+        return true;
     }
 }

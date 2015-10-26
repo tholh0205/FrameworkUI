@@ -9,13 +9,12 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
-import android.view.animation.Animation;
-
-import java.util.HashMap;
 
 /**
  * Created by ThoLH on 10/02/2015.
@@ -31,6 +30,12 @@ public class BaseFragment {
     //Fragment Result Data
     public int mResultCode = Activity.RESULT_CANCELED;
     public Intent mData = null;
+
+    boolean hasMenu = false;
+
+    protected void setHasMenu(boolean hasMenu) {
+        this.hasMenu = hasMenu;
+    }
 
     public BaseFragment() {
     }
@@ -84,9 +89,18 @@ public class BaseFragment {
         return up;
     }
 
+    protected Drawable getMenuMoreDrawable() {
+        Drawable up = getActivity().getResources().getDrawable(android.support.v7.appcompat.R.drawable.abc_ic_menu_moreoverflow_mtrl_alpha);
+        up.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_IN);
+        return up;
+    }
+
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+    }
+
     public boolean onOptionItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
-            return finishFragment(false);
+            return finishFragment(true);
         }
         return false;
     }
@@ -119,12 +133,27 @@ public class BaseFragment {
         this.mFragmentView = view;
     }
 
+    public void onCreate(Bundle savedInstanceState) {
+    }
+
+    public void onAttach(Activity activity) {
+
+    }
+
+    public void onDetach() {
+
+    }
+
+    public void onActivityCreated(Bundle savedInstanceState) {
+    }
+
     protected void clearViews() {
         if (mFragmentView != null) {
             ViewParent parent = mFragmentView.getParent();
             if (parent != null && ViewGroup.class.isInstance(parent)) {
                 try {
                     ((ViewGroup) parent).removeView(mFragmentView);
+                    onDetach();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -158,9 +187,15 @@ public class BaseFragment {
     }
 
     public void onResume() {
+        if (mFragmentView != null) {
+            mFragmentView.setEnabled(true);
+        }
     }
 
     public void onPause() {
+        if (mFragmentView != null) {
+            mFragmentView.setEnabled(false);
+        }
     }
 
     public void onDestroy() {
@@ -194,5 +229,11 @@ public class BaseFragment {
     }
 
     public interface SingleInstance {
+    }
+
+    public interface KeepBelowFragment {
+    }
+
+    public interface OverlayFragment {
     }
 }
