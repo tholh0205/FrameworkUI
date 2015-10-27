@@ -2,7 +2,6 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#33bbccdd"
     android:orientation="vertical">
 
     <Button
@@ -10,5 +9,5 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="16.0dip"
-        android:text="GALLERY FRAGMENT" />
+        android:text="CHILD FRAGMENT" />
 </LinearLayout>

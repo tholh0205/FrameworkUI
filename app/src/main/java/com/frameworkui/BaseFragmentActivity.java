@@ -1,5 +1,6 @@
 package com.frameworkui;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
@@ -77,6 +78,14 @@ public class BaseFragmentActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onDestroy() {
+        if (getFragmentManagerLayout() != null) {
+            getFragmentManagerLayout().onDestroy();
+        }
+        super.onDestroy();
+    }
+
+    @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putParcelableArrayList(SAVED_FRAGMENT_STACK, getFragmentManagerLayout().getFragmentStack());
@@ -97,5 +106,11 @@ public class BaseFragmentActivity extends AppCompatActivity {
             getFragmentManagerLayout().onOptionItemSelected(item);
         }
         return true;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        getFragmentManagerLayout().onActivityResult(requestCode, resultCode, data);
     }
 }

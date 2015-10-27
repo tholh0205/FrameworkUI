@@ -1,6 +1,7 @@
 package com.frameworkui;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,14 +12,14 @@ import android.view.ViewGroup;
 public class GalleryFragment extends BaseFragment implements BaseFragment.KeepBelowFragment {
 
     @Override
-    public View onCreateView(Context context, ViewGroup container) {
-        mFragmentView = LayoutInflater.from(context).inflate(R.layout.gallery_fragment, container, false);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        mFragmentView = inflater.inflate(R.layout.gallery_fragment, container, false);
         return mFragmentView;
     }
 
     @Override
-    public void onViewCreated(View view) {
-        super.onViewCreated(view);
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
         view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -28,8 +29,7 @@ public class GalleryFragment extends BaseFragment implements BaseFragment.KeepBe
     }
 
     @Override
-    public boolean onBackPressed() {
-        finishFragment(false);
-        return true;
+    public boolean finishFragment(boolean animated) {
+        return super.finishFragment(false);
     }
 }

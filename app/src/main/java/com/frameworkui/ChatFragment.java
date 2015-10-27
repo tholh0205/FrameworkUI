@@ -19,9 +19,15 @@ public class ChatFragment extends BaseFragment implements BaseFragment.SingleIns
 
 
     @Override
-    public View onCreateView(Context context, ViewGroup container) {
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        android.util.Log.d("ThoLH", "ChatFragment savedInstanceState = " + savedInstanceState);
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         setHasMenu(true);
-        mFragmentView = LayoutInflater.from(context).inflate(R.layout.chat_fragment, container, false);
+        mFragmentView = inflater.inflate(R.layout.chat_fragment, container, false);
         mFragmentView.findViewById(R.id.button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -31,6 +37,12 @@ public class ChatFragment extends BaseFragment implements BaseFragment.SingleIns
         });
         android.util.Log.d("ThoLH", " ChatFragment get key MainFragment = " + getArguments().getString("MainFragment"));
         return mFragmentView;
+    }
+
+    @Override
+    public void onNewIntent() {
+        super.onNewIntent();
+        android.util.Log.d("ThoLH", "ChatFragment onNewIntent " + getArguments());
     }
 
     @Override

@@ -357,7 +357,7 @@ public class BaseActivity extends AppCompatActivity {
 //        showLastFragment(mSavedInstanceState);
 //        if (currentFragment.mRequestCode >= 0) {
 //            BaseFragment lastFragment = mFragmentStack.get(mFragmentStack.size() - 1).getFragment();
-//            lastFragment.onActivityResultFragment(currentFragment.mRequestCode, currentFragment.mResultCode, currentFragment.mData);
+//            lastFragment.onActivityResult(currentFragment.mRequestCode, currentFragment.mResultCode, currentFragment.mData);
 //        }
 //        mHandler.postDelayed(new Runnable() {
 //            @Override

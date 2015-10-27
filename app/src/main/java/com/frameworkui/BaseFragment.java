@@ -9,6 +9,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -21,11 +22,18 @@ import android.view.ViewParent;
  */
 public class BaseFragment {
 
-    private boolean isFinished = false;
+    boolean isFinished = false;
+    boolean isResumed = false;
+    boolean isRemoving = false;
     public View mFragmentView = null;
     private Toolbar mToolbar = null;
     protected Bundle mArguments = null;
     private BaseFragmentActivity mBaseActivity = null;
+    private ChildFragmentManager mChildFragmentManager = new ChildFragmentManager();
+
+    public ChildFragmentManager getChildFragmentManager() {
+        return mChildFragmentManager;
+    }
 
     //Fragment Result Data
     public int mResultCode = Activity.RESULT_CANCELED;
@@ -51,6 +59,7 @@ public class BaseFragment {
 
     public void setActivity(BaseFragmentActivity baseActivity) {
         this.mBaseActivity = baseActivity;
+        mChildFragmentManager.mActivity = baseActivity;
     }
 
     public BaseFragmentActivity getActivity() {
@@ -125,15 +134,21 @@ public class BaseFragment {
             getToolbar().setSubtitle(subtitle);
     }
 
-    public View onCreateView(Context context, ViewGroup container) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return null;
     }
 
-    public void onViewCreated(View view) {
+    public void onViewCreated(View view, Bundle savedInstanceState) {
         this.mFragmentView = view;
     }
 
     public void onCreate(Bundle savedInstanceState) {
+        isFinished = false;
+        isResumed = false;
+        mChildFragmentManager.mSavedInstanceState = savedInstanceState;
+    }
+
+    public void onNewIntent() {
     }
 
     public void onAttach(Activity activity) {
@@ -170,8 +185,8 @@ public class BaseFragment {
     }
 
     public boolean onBackPressed() {
-//        return finishFragment(false);
-        return false;
+        return finishFragment(true);
+//        return false;
     }
 
     protected void setResult(int resultCode, Intent data) {
@@ -183,22 +198,21 @@ public class BaseFragment {
         }
     }
 
-    public void onActivityResultFragment(int requestCode, int resultCode, Intent data) {
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
     }
 
     public void onResume() {
-        if (mFragmentView != null) {
-            mFragmentView.setEnabled(true);
-        }
+        isResumed = true;
+        mChildFragmentManager.onResume();
     }
 
     public void onPause() {
-        if (mFragmentView != null) {
-            mFragmentView.setEnabled(false);
-        }
+        isResumed = false;
+        mChildFragmentManager.onPause();
     }
 
     public void onDestroy() {
+        mChildFragmentManager.onDestroy();
         clearViews();
     }
 
@@ -215,17 +229,22 @@ public class BaseFragment {
             outState.putBundle("mResultData", mData.getExtras());
         if (mArguments != null)
             outState.putBundle("mArguments", mArguments);
+        mChildFragmentManager.onSaveInstanceState(outState);
     }
 
-    public void onRestoreInstanceState(Bundle savedInstanceState) {
-        if (savedInstanceState == null)
-            return;
-        Bundle data = savedInstanceState.containsKey("mResultData") ? savedInstanceState.getBundle("mResultData") : null;
-        if (data != null) {
-            mData = new Intent();
-            mData.putExtras(data);
-        }
-        mArguments = savedInstanceState.containsKey("mArguments") ? savedInstanceState.getBundle("mArguments") : null;
+//    public void onRestoreInstanceState(Bundle savedInstanceState) {
+//        if (savedInstanceState == null)
+//            return;
+//        Bundle data = savedInstanceState.containsKey("mResultData") ? savedInstanceState.getBundle("mResultData") : null;
+//        if (data != null) {
+//            mData = new Intent();
+//            mData.putExtras(data);
+//        }
+//        mArguments = savedInstanceState.containsKey("mArguments") ? savedInstanceState.getBundle("mArguments") : null;
+//    }
+
+    public boolean isFinished() {
+        return isFinished;
     }
 
     public interface SingleInstance {
@@ -234,6 +253,4 @@ public class BaseFragment {
     public interface KeepBelowFragment {
     }
 
-    public interface OverlayFragment {
-    }
 }

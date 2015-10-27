@@ -3,19 +3,29 @@ package com.frameworkui;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 
 /**
  * Created by ThoLH on 10/05/2015.
  */
 public class ProfileFragment extends BaseFragment {
+
     @Override
-    public View onCreateView(Context context, ViewGroup container) {
-        mFragmentView = LayoutInflater.from(context).inflate(R.layout.profile_fragment, container, false);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        mFragmentView = inflater.inflate(R.layout.profile_fragment, container, false);
         mFragmentView.findViewById(R.id.button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //getBaseActivity().presentFragment(BaseActivity.FragmentType.CHAT, null, 2222, BaseActivity.TRANSLATION_WITH_FADE_IN);
+                getActivity().getFragmentManagerLayout().showFragment(FragmentData.FragmentType.GALLERY, null, 0, true, false);
+            }
+        });
+        mFragmentView.findViewById(R.id.search_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 //getBaseActivity().presentFragment(BaseActivity.FragmentType.CHAT, null, 2222, BaseActivity.TRANSLATION_WITH_FADE_IN);
@@ -26,8 +36,9 @@ public class ProfileFragment extends BaseFragment {
     }
 
     @Override
-    public void onViewCreated(View view) {
-        super.onViewCreated(view);
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        getChildFragmentManager().showFragment((FrameLayout) view.findViewById(R.id.child_fragment_container), new ChildFragment());
     }
 
     @Override
