@@ -3,7 +3,7 @@ package com.frameworkui;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
+import android.view.ViewParent;
 
 import java.util.ArrayList;
 
@@ -15,8 +15,13 @@ public class ChildFragmentManager {
     private ArrayList<BaseFragment> mChildFragments = new ArrayList<>();
     BaseFragmentActivity mActivity;
     Bundle mSavedInstanceState;
+    private BaseFragment mCurrentFragment; //It's only use in main tab
 
     public void showFragment(ViewGroup containerView, BaseFragment fragment) {
+        showFragment(containerView, fragment, true);
+    }
+
+    public void showFragment(ViewGroup containerView, BaseFragment fragment, boolean moveToResume) {
         if (fragment == null || containerView == null) {
             return;
         }
@@ -26,6 +31,7 @@ public class ChildFragmentManager {
         fragment.onActivityCreated(mSavedInstanceState);
         View fragmentView = fragment.mFragmentView;
         if (fragmentView == null) {
+            android.util.Log.d("ThoLH", "ChildFragmentManager showFragment fragmentView == null");
             fragmentView = fragment.onCreateView(mActivity.getLayoutInflater(), containerView, mSavedInstanceState);
             fragment.onViewCreated(fragmentView, mSavedInstanceState);
         } else {
@@ -40,20 +46,49 @@ public class ChildFragmentManager {
         layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT;
         layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT;
         fragmentView.setLayoutParams(layoutParams);
-        fragment.onResume();
+        if (moveToResume)
+            fragment.onResume();
+    }
+
+    public void remove(BaseFragment fragment) {
+        if (fragment == null) {
+            return;
+        }
+        if (!fragment.isPaused)
+            fragment.onPause();
+        if (!BaseFragment.SingleInstance.class.isInstance(fragment))
+            fragment.onDestroy();
+        else {
+            ViewParent parent = fragment.getView().getParent();
+            if (parent != null && ViewGroup.class.isInstance(parent)) {
+                try {
+                    ((ViewGroup) parent).removeView(fragment.getView());
+                    fragment.onDetach();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        mChildFragments.remove(fragment);
     }
 
     public void onResume() {
-        for (BaseFragment fragment : mChildFragments) {
-            if (!fragment.isResumed) {
-                fragment.onResume();
+        if (mCurrentFragment != null) {
+            if (!mCurrentFragment.isResumed && mCurrentFragment.isAdded)
+                mCurrentFragment.onResume();
+        } else {
+            for (BaseFragment fragment : mChildFragments) {
+                if (!fragment.isResumed) {
+                    fragment.onResume();
+                }
             }
         }
     }
 
     public void onPause() {
         for (BaseFragment fragment : mChildFragments) {
-            fragment.onPause();
+            if (!fragment.isPaused)
+                fragment.onPause();
         }
     }
 
@@ -67,6 +102,10 @@ public class ChildFragmentManager {
         for (BaseFragment fragment : mChildFragments) {
             fragment.onSaveInstanceState(outState);
         }
+    }
+
+    public void setCurrentFragment(BaseFragment fragment) {
+        this.mCurrentFragment = fragment;
     }
 
 }

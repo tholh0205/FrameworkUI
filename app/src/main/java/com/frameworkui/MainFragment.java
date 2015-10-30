@@ -45,8 +45,8 @@ public class MainFragment extends BaseFragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        ViewPager viewPager = (ViewPager) view.findViewById(R.id.tabs);
-        viewPager.setAdapter(new TabsAdapter(getActivity().getSupportFragmentManager()));
+        final ViewPager viewPager = (ViewPager) view.findViewById(R.id.tabs);
+        viewPager.setAdapter(new TabsAdapter(getChildFragmentManager()));
         final TabLayout tabLayout = (TabLayout) view.findViewById(R.id.tab_layout);
         tabLayout.setupWithViewPager(viewPager);
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
@@ -57,7 +57,6 @@ public class MainFragment extends BaseFragment {
 
             @Override
             public void onPageSelected(int position) {
-
             }
 
             @Override
@@ -123,15 +122,26 @@ public class MainFragment extends BaseFragment {
         android.util.Log.d("ThoLH", "MainFragment onDetach");
     }
 
-    private class TabsAdapter extends FragmentStatePagerAdapter {
+    private class TabsAdapter extends BaseFragmentPagerAdapter {
 
-        public TabsAdapter(FragmentManager fm) {
-            super(fm);
+        private BaseFragment[] fragments = new BaseFragment[4];
+        private int mPreviousPosition = 0;
+
+        public TabsAdapter(ChildFragmentManager childFragmentManager) {
+            super(childFragmentManager);
         }
 
         @Override
-        public Fragment getItem(int position) {
-            return new TabFragment();
+        public BaseFragment getItem(int position) {
+            BaseFragment f = fragments[position];
+            if (f == null) {
+                Bundle bundle = new Bundle();
+                bundle.putInt("position", position);
+                f = new TabFragment();
+                f.setArguments(bundle);
+                fragments[position] = f;
+            }
+            return f;
         }
 
         @Override
@@ -143,5 +153,6 @@ public class MainFragment extends BaseFragment {
         public CharSequence getPageTitle(int position) {
             return "Tab " + position;
         }
+
     }
 }

@@ -10,7 +10,8 @@ import android.view.ViewGroup;
 /**
  * Created by ThoLH on 10/26/15.
  */
-public class TabFragment extends Fragment {
+public class TabFragment extends BaseFragment implements BaseFragment.SingleInstance{
+
 
     @Nullable
     @Override
@@ -29,5 +30,33 @@ public class TabFragment extends Fragment {
                 ((BaseFragmentActivity) getActivity()).getFragmentManagerLayout().showFragment(FragmentData.FragmentType.CHAT, bundle, 1111, false, false);
             }
         });
+    }
+
+    @Override
+    public void onResume() {
+        int position = getArguments().containsKey("position") ? getArguments().getInt("position") : -1;
+        android.util.Log.d("ThoLH", "TabFragment " + position + " onResume");
+        super.onResume();
+    }
+
+    @Override
+    public void onPause() {
+        int position = getArguments().containsKey("position") ? getArguments().getInt("position") : -1;
+        android.util.Log.d("ThoLH", "TabFragment " + position + " onPause");
+        super.onPause();
+    }
+
+    @Override
+    public void onDestroy() {
+        int position = getArguments().containsKey("position") ? getArguments().getInt("position") : -1;
+        android.util.Log.d("ThoLH", "TabFragment " + position + " onDestroy");
+        super.onDestroy();
+    }
+
+    @Override
+    public void onDetach() {
+        int position = getArguments().containsKey("position") ? getArguments().getInt("position") : -1;
+        android.util.Log.d("ThoLH", "TabFragment " + position + " onDetach");
+        super.onDetach();
     }
 }

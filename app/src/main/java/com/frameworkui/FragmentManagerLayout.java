@@ -125,7 +125,13 @@ public class FragmentManagerLayout extends FrameLayout {
     }
 
     public void onLowMemory() {
-
+        if (!mFragmentStack.isEmpty()) {
+            for (FragmentData.FragmentItem fragmentItem : mFragmentStack) {
+                if (fragmentItem.getFragment() != null) {
+                    fragmentItem.getFragment().onLowMemory();
+                }
+            }
+        }
     }
 
     public void recreateAllFragmentViews(boolean includeLast) {

@@ -25,6 +25,8 @@ public class BaseFragment {
     boolean isFinished = false;
     boolean isResumed = false;
     boolean isRemoving = false;
+    boolean isPaused = false;
+    boolean isAdded = false;
     public View mFragmentView = null;
     private Toolbar mToolbar = null;
     protected Bundle mArguments = null;
@@ -142,6 +144,11 @@ public class BaseFragment {
         this.mFragmentView = view;
     }
 
+    public View getView() {
+        return mFragmentView;
+    }
+
+
     public void onCreate(Bundle savedInstanceState) {
         isFinished = false;
         isResumed = false;
@@ -152,11 +159,15 @@ public class BaseFragment {
     }
 
     public void onAttach(Activity activity) {
-
+        isAdded = true;
+        isPaused = false;
+        isResumed = false;
     }
 
     public void onDetach() {
-
+        isAdded = false;
+        isPaused = false;
+        isResumed = false;
     }
 
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -203,11 +214,13 @@ public class BaseFragment {
 
     public void onResume() {
         isResumed = true;
+        isPaused = false;
         mChildFragmentManager.onResume();
     }
 
     public void onPause() {
         isResumed = false;
+        isPaused = true;
         mChildFragmentManager.onPause();
     }
 
@@ -245,6 +258,10 @@ public class BaseFragment {
 
     public boolean isFinished() {
         return isFinished;
+    }
+
+    public void onLowMemory() {
+
     }
 
     public interface SingleInstance {
