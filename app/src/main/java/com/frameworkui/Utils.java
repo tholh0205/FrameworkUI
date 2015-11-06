@@ -17,4 +17,8 @@ public class Utils {
         }
     }
 
+    public static float getPixelsInCM(float cm, boolean isX) {
+        return (cm / 2.54f) * (isX ? MainApplication.getInstance().getResources().getDisplayMetrics().xdpi : MainApplication.getInstance().getResources().getDisplayMetrics().ydpi);
+    }
+
 }

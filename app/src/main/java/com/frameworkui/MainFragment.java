@@ -18,7 +18,14 @@ import android.widget.Toast;
 /**
  * Created by ThoLH on 10/05/2015.
  */
-public class MainFragment extends BaseFragment {
+public class MainFragment extends BaseFragment implements BaseFragment.SingleInstance {
+
+    private ViewPager mViewPager;
+
+    @Override
+    public boolean isEnableSwipeBack() {
+        return false;
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -45,11 +52,11 @@ public class MainFragment extends BaseFragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        final ViewPager viewPager = (ViewPager) view.findViewById(R.id.tabs);
-        viewPager.setAdapter(new TabsAdapter(getChildFragmentManager()));
+        mViewPager = (ViewPager) view.findViewById(R.id.tabs);
+        mViewPager.setAdapter(new TabsAdapter(getChildFragmentManager()));
         final TabLayout tabLayout = (TabLayout) view.findViewById(R.id.tab_layout);
-        tabLayout.setupWithViewPager(viewPager);
-        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+        tabLayout.setupWithViewPager(mViewPager);
+        mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
                 tabLayout.setScrollPosition(position, positionOffset, true);
@@ -117,7 +124,16 @@ public class MainFragment extends BaseFragment {
     }
 
     @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        if (mViewPager != null)
+            mViewPager.setVisibility(View.VISIBLE);
+    }
+
+    @Override
     public void onDetach() {
+        if (mViewPager != null)
+            mViewPager.setVisibility(View.GONE);
         super.onDetach();
         android.util.Log.d("ThoLH", "MainFragment onDetach");
     }

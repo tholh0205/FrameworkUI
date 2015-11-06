@@ -10,8 +10,16 @@ import android.view.ViewGroup;
 /**
  * Created by ThoLH on 10/26/15.
  */
-public class TabFragment extends BaseFragment implements BaseFragment.SingleInstance{
+public class TabFragment extends BaseFragment implements BaseFragment.SingleInstance {
 
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        int position = getArguments().containsKey("position") ? getArguments().getInt("position") : -1;
+        if (position == 3 && savedInstanceState != null && savedInstanceState.containsKey("TabFragment")) {
+            android.util.Log.d("ThoLH", "TabFragment 3 " + savedInstanceState.getInt("TabFragment"));
+        }
+    }
 
     @Nullable
     @Override
@@ -58,5 +66,15 @@ public class TabFragment extends BaseFragment implements BaseFragment.SingleInst
         int position = getArguments().containsKey("position") ? getArguments().getInt("position") : -1;
         android.util.Log.d("ThoLH", "TabFragment " + position + " onDetach");
         super.onDetach();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        int position = getArguments().containsKey("position") ? getArguments().getInt("position") : -1;
+        android.util.Log.d("ThoLH", "TabFragment " + position + " onSaveInstanceState");
+        if (position == 3) {
+            outState.putInt("TabFragment", position);
+        }
     }
 }

@@ -1,7 +1,6 @@
 package com.frameworkui;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
@@ -9,6 +8,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -264,10 +264,17 @@ public class BaseFragment {
 
     }
 
+    public boolean isEnableSwipeBack() {
+        return true;
+    }
+
     public interface SingleInstance {
     }
 
     public interface KeepBelowFragment {
+    }
+
+    public interface ReusableFragment extends SingleInstance {
     }
 
 }

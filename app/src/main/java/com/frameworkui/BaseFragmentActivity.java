@@ -30,8 +30,15 @@ public class BaseFragmentActivity extends AppCompatActivity {
             if (savedInstanceState.containsKey(SAVED_FRAGMENT_STACK)) {
                 ArrayList<FragmentData.FragmentItem> data = savedInstanceState.getParcelableArrayList(SAVED_FRAGMENT_STACK);
                 mFragmentManager.init(data);
-                mFragmentManager.showLastFragment();
-                mFragmentManager.recreateAllFragmentViews(false);
+                MainApplication.getInstance().runOnUIThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (mFragmentManager != null) {
+                            mFragmentManager.showLastFragment();
+                            mFragmentManager.recreateAllFragmentViews(false);
+                        }
+                    }
+                });
             }
         } else {
             mFragmentManager.init(null);

@@ -38,7 +38,7 @@ public class ProfileFragment extends BaseFragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        getChildFragmentManager().showFragment((FrameLayout) view.findViewById(R.id.child_fragment_container), new ChildFragment());
+        getChildFragmentManager().showFragment((FrameLayout) getView().findViewById(R.id.child_fragment_container), new ChildFragment());
     }
 
     @Override
@@ -61,8 +61,8 @@ public class ProfileFragment extends BaseFragment {
 
     @Override
     public void onResume() {
-        super.onResume();
         android.util.Log.d("ThoLH", "ProfileFragment onResume");
+        super.onResume();
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.frameworkui;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
@@ -11,6 +12,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
+import android.view.VelocityTracker;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -18,6 +20,8 @@ import android.widget.LinearLayout;
 
 import com.nineoldandroids.animation.Animator;
 import com.nineoldandroids.animation.AnimatorListenerAdapter;
+import com.nineoldandroids.animation.AnimatorSet;
+import com.nineoldandroids.animation.ObjectAnimator;
 import com.nineoldandroids.view.ViewHelper;
 
 import java.util.ArrayList;
@@ -28,9 +32,18 @@ import java.util.ArrayList;
 public class FragmentManagerLayout extends FrameLayout {
 
     private ArrayList<FragmentData.FragmentItem> mFragmentStack = new ArrayList<>();
+    private ArrayList<FragmentData.FragmentItem> mReusableList = new ArrayList<>();
 
     private LinearLayout mContainerViewBack, mContainerView;
     private Bundle mSavedInstanceState;
+    private boolean mAnimationInProgress = false;
+    private boolean mStartedTracking = false;
+    private boolean mMaybeStartTracking = false;
+    private int mStartedTrackingX;
+    private int mStartedTrackingY;
+    private boolean mBeginTrackingSent = false;
+    private VelocityTracker mVelocityTracker;
+    private int mStartedTrackingPointerId;
 
     public FragmentManagerLayout(Context context) {
         super(context);
@@ -58,7 +71,7 @@ public class FragmentManagerLayout extends FrameLayout {
     }
 
     public void init(ArrayList<FragmentData.FragmentItem> stack) {
-        mContainerViewBack = new LinearLayout(getContext());
+        mContainerViewBack = new InterceptTouchLinearLayout(getContext());
         addView(mContainerViewBack);
         LayoutParams layoutParams = (LayoutParams) mContainerViewBack.getLayoutParams();
         layoutParams.width = LayoutParams.MATCH_PARENT;
@@ -66,7 +79,7 @@ public class FragmentManagerLayout extends FrameLayout {
         layoutParams.gravity = Gravity.TOP | Gravity.LEFT;
         mContainerViewBack.setLayoutParams(layoutParams);
 
-        mContainerView = new LinearLayout(getContext());
+        mContainerView = new InterceptTouchLinearLayout(getContext());
         addView(mContainerView);
         layoutParams = (LayoutParams) mContainerView.getLayoutParams();
         layoutParams.width = LayoutParams.MATCH_PARENT;
@@ -101,21 +114,215 @@ public class FragmentManagerLayout extends FrameLayout {
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
-        return super.onInterceptTouchEvent(ev);
+        return !(!mAnimationInProgress) || onTouchEvent(ev);
     }
 
     @Override
     public void requestDisallowInterceptTouchEvent(boolean disallowIntercept) {
+        android.util.Log.d("ThoLH", "requestDisallowInterceptTouchEvent " + disallowIntercept);
         onTouchEvent(null);
         super.requestDisallowInterceptTouchEvent(disallowIntercept);
     }
 
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
+    public boolean onTouchEvent(MotionEvent ev) {
+        if (!mAnimationInProgress) {
+            if (mFragmentStack.size() > 1) {
+                if (ev != null && ev.getAction() == MotionEvent.ACTION_DOWN && !mStartedTracking && !mMaybeStartTracking) {
+                    BaseFragment currentFragment = mFragmentStack.get(mFragmentStack.size() - 1).getFragment();
+                    if (!currentFragment.isEnableSwipeBack()) {
+                        return false;
+                    }
+                    mStartedTrackingPointerId = ev.getPointerId(0);
+                    mMaybeStartTracking = true;
+                    mStartedTrackingX = (int) ev.getX();
+                    mStartedTrackingY = (int) ev.getY();
+                    if (mVelocityTracker != null) {
+                        mVelocityTracker.clear();
+                    }
+                } else if (ev != null && ev.getAction() == MotionEvent.ACTION_MOVE && ev.getPointerId(0) == mStartedTrackingPointerId) {
+                    if (mVelocityTracker == null) {
+                        mVelocityTracker = VelocityTracker.obtain();
+                    }
+                    int dx = Math.max(0, (int) (ev.getX() - mStartedTrackingX));
+                    int dy = Math.abs((int) ev.getY() - mStartedTrackingY);
+                    mVelocityTracker.addMovement(ev);
+                    if (mMaybeStartTracking && !mStartedTracking && dx >= Utils.getPixelsInCM(0.4f, true) && Math.abs(dx) / 3 > dy) {
+                        prepareForMoving(ev);
+                    } else if (mStartedTracking) {
+                        if (!mBeginTrackingSent) {
+                            if (getBaseActivity().getCurrentFocus() != null) {
+//                                AndroidUtilities.hideKeyboard(parentActivity.getCurrentFocus());
+                            }
+//                            BaseFragment currentFragment = mFragmentStack.get(mFragmentStack.size() - 1).getFragment();
+//                            currentFragment.onBeginSlide();
+                            mBeginTrackingSent = true;
+                        }
+                        ViewHelper.setTranslationX(mContainerView, dx);
+//                        ViewHelper.setTranslationX(mContainerViewBack, -(getResources().getDisplayMetrics().widthPixels - dx) / 2);
+//                        setInnerTranslationX(dx);
+                    }
+                } else if (ev != null && ev.getPointerId(0) == mStartedTrackingPointerId && (ev.getAction() == MotionEvent.ACTION_CANCEL || ev.getAction() == MotionEvent.ACTION_UP || ev.getAction() == MotionEvent.ACTION_POINTER_UP)) {
+                    if (mVelocityTracker == null) {
+                        mVelocityTracker = VelocityTracker.obtain();
+                    }
+                    mVelocityTracker.computeCurrentVelocity(1000);
+                    if (!mStartedTracking && mFragmentStack.get(mFragmentStack.size() - 1).getFragment().isEnableSwipeBack()) {
+                        float velX = mVelocityTracker.getXVelocity();
+                        float velY = mVelocityTracker.getYVelocity();
+                        if (velX >= 3500 && velX > Math.abs(velY)) {
+                            prepareForMoving(ev);
+                            if (!mBeginTrackingSent) {
+                                if (((Activity) getContext()).getCurrentFocus() != null) {
+//                                    AndroidUtilities.hideKeyboard(((Activity) getContext()).getCurrentFocus());
+                                }
+                                mBeginTrackingSent = true;
+                            }
+                        }
+                    }
+                    if (mStartedTracking) {
+                        float x = ViewHelper.getX(mContainerView);
+                        AnimatorSet animatorSet = new AnimatorSet();
+                        float velX = mVelocityTracker.getXVelocity();
+                        float velY = mVelocityTracker.getYVelocity();
+                        final boolean backAnimation = x < mContainerView.getMeasuredWidth() / 3.0f && (velX < 3500 || velX < velY);
+                        float distToMove;
+                        if (!backAnimation) {
+                            distToMove = mContainerView.getMeasuredWidth() - x;
+                            animatorSet.playTogether(
+                                    ObjectAnimator.ofFloat(mContainerView, "translationX", mContainerView.getMeasuredWidth())
+//                                    ObjectAnimatorProxy.ofFloat(this, "innerTranslationX", (float) mContainerView.getMeasuredWidth())
+                            );
+                        } else {
+                            distToMove = x;
+                            animatorSet.playTogether(
+                                    ObjectAnimator.ofFloat(mContainerView, "translationX", 0)
+//                                    ObjectAnimatorProxy.ofFloat(this, "innerTranslationX", 0.0f)
+                            );
+                        }
+
+                        animatorSet.setDuration(Math.max((int) (200.0f / mContainerView.getMeasuredWidth() * distToMove), 50));
+                        animatorSet.addListener(new AnimatorListenerAdapter() {
+                            @Override
+                            public void onAnimationEnd(Animator animation) {
+                                super.onAnimationEnd(animation);
+                                onSlideAnimationEnd(backAnimation);
+                            }
+
+                            @Override
+                            public void onAnimationCancel(Animator animation) {
+                                super.onAnimationCancel(animation);
+                                onSlideAnimationEnd(backAnimation);
+                            }
+                        });
+                        animatorSet.start();
+                        mAnimationInProgress = true;
+                    } else {
+                        mMaybeStartTracking = false;
+                        mStartedTracking = false;
+                    }
+                    if (mVelocityTracker != null) {
+                        mVelocityTracker.recycle();
+                        mVelocityTracker = null;
+                    }
+                } else if (ev == null) {
+                    mMaybeStartTracking = false;
+                    mStartedTracking = false;
+                    if (mVelocityTracker != null) {
+                        mVelocityTracker.recycle();
+                        mVelocityTracker = null;
+                    }
+                }
+            }
+            return mStartedTracking;
+        }
         return false;
     }
 
+    private void prepareForMoving(MotionEvent ev) {
+        mMaybeStartTracking = false;
+        mStartedTracking = true;
+        mStartedTrackingX = (int) ev.getX();
+        mContainerViewBack.setVisibility(View.VISIBLE);
+        mBeginTrackingSent = false;
+
+        BaseFragment lastFragment = mFragmentStack.get(mFragmentStack.size() - 2).getFragment();
+        View fragmentView = lastFragment.mFragmentView;
+        if (fragmentView == null) {
+            fragmentView = lastFragment.onCreateView(getBaseActivity().getLayoutInflater(), null, mSavedInstanceState);
+        } else {
+            ViewGroup parent = (ViewGroup) fragmentView.getParent();
+            if (parent != null) {
+                parent.removeView(fragmentView);
+            }
+        }
+
+        mContainerViewBack.addView(fragmentView);
+        lastFragment.onAttach(getBaseActivity());
+        ViewGroup.LayoutParams layoutParams = fragmentView.getLayoutParams();
+        layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT;
+        layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT;
+        fragmentView.setLayoutParams(layoutParams);
+
+        lastFragment.onResume();
+        lastFragment.onSetupActionBar();
+
+        //AndroidUtilities.lockOrientation(parentActivity);
+    }
+
+    private void onSlideAnimationEnd(final boolean backAnimation) {
+        boolean isKeepBelowItem = BaseFragment.KeepBelowFragment.class.isInstance(mFragmentStack.get(mFragmentStack.size() - 1).getFragment());
+        if (!backAnimation) {
+            BaseFragment lastFragment = mFragmentStack.get(mFragmentStack.size() - 1).getFragment();
+            lastFragment.onPause();
+            if (BaseFragment.ReusableFragment.class.isInstance(lastFragment)) {
+                if (lastFragment.mFragmentView != null) {
+                    ViewGroup parent = (ViewGroup) lastFragment.mFragmentView.getParent();
+                    if (parent != null) {
+                        parent.removeView(lastFragment.mFragmentView);
+                        lastFragment.onDetach();
+                    }
+                }
+                mReusableList.add(mFragmentStack.get(mFragmentStack.size() - 1));
+            } else {
+                lastFragment.onDestroy();
+                lastFragment.setActivity(null);
+            }
+            mFragmentStack.remove(mFragmentStack.size() - 1);
+
+            LinearLayout temp = mContainerView;
+            mContainerView = mContainerViewBack;
+            mContainerViewBack = temp;
+            mContainerView.setVisibility(View.VISIBLE);
+            bringChildToFront(mContainerView);
+
+            lastFragment = mFragmentStack.get(mFragmentStack.size() - 1).getFragment();
+            lastFragment.onResume();
+            lastFragment.onSetupActionBar();
+        } else {
+            BaseFragment lastFragment = mFragmentStack.get(mFragmentStack.size() - 2).getFragment();
+            lastFragment.onPause();
+            if (lastFragment.mFragmentView != null && !isKeepBelowItem) {
+                ViewGroup parent = (ViewGroup) lastFragment.mFragmentView.getParent();
+                if (parent != null) {
+                    parent.removeView(lastFragment.mFragmentView);
+                    lastFragment.onDetach();
+                }
+            }
+        }
+        if (!isKeepBelowItem)
+            mContainerViewBack.setVisibility(View.GONE);
+        //AndroidUtilities.unlockOrientation(parentActivity);
+        mStartedTracking = false;
+        mAnimationInProgress = false;
+
+        ViewHelper.setTranslationX(mContainerView, 0);
+        ViewHelper.setTranslationX(mContainerViewBack, 0);
+    }
+
     public boolean onBackPressed() {
+        if (mStartedTracking) {
+            return true;
+        }
         if (!mFragmentStack.isEmpty()) {
             if (mFragmentStack.get(mFragmentStack.size() - 1).getFragment().onBackPressed()) {
                 return true;
@@ -148,6 +355,7 @@ public class FragmentManagerLayout extends FrameLayout {
 
             boolean needAnimation = noAnimation ? false : true;
             boolean isSingleItem = false;
+            boolean isReusableItem = false;
 
             final FragmentData.FragmentItem currentFragmentItem = mFragmentStack.isEmpty() ? null : mFragmentStack.get(mFragmentStack.size() - 1);
 
@@ -162,10 +370,26 @@ public class FragmentManagerLayout extends FrameLayout {
                 }
             }
 
+            if (fragmentItem == null && !mReusableList.isEmpty()) {
+                for (FragmentData.FragmentItem item : mReusableList) {
+                    if (item.mFragmentType.getTypeId() == fragmentType.getTypeId()) {
+                        fragmentItem = item;
+                        isSingleItem = false;
+                        isReusableItem = true;
+                        break;
+                    }
+                }
+            }
+
             if (fragmentItem == null) {
                 fragmentItem = new FragmentData.FragmentItem(fragmentType, data);
-                mFragmentStack.add(fragmentItem);
             }
+
+            if (!isSingleItem || isReusableItem) {
+                mFragmentStack.add(fragmentItem);
+                mReusableList.remove(fragmentItem);
+            }
+
             if (fragmentItem.getFragment() == null) {
                 fragmentItem.mFragment = fragmentType.getFragmentClass().newInstance();
                 fragmentItem.mFragment.setArguments(data);
@@ -337,14 +561,7 @@ public class FragmentManagerLayout extends FrameLayout {
             layoutParams.height = LinearLayout.LayoutParams.MATCH_PARENT;
             fragmentView.setLayoutParams(layoutParams);
             fragmentItem.getFragment().onResume();
-            MainApplication.getInstance().runOnUIThread(new Runnable() {
-                @Override
-                public void run() {
-                    if (fragmentItem != null && fragmentItem.getFragment() != null) {
-                        fragmentItem.getFragment().onSetupActionBar();
-                    }
-                }
-            });
+            fragmentItem.getFragment().onSetupActionBar();
 
             LinearLayout temp = mContainerView;
             mContainerView = mContainerViewBack;
@@ -448,16 +665,18 @@ public class FragmentManagerLayout extends FrameLayout {
                     getBaseActivity().supportInvalidateOptionsMenu();
             }
         });
-        if (!BaseFragment.SingleInstance.class.isInstance(fragment)) {
+        if (!BaseFragment.ReusableFragment.class.isInstance(fragment)) {
             fragment.onDestroy();
+            fragment.setActivity(null);
         } else {
             ViewGroup parent = (ViewGroup) fragment.mFragmentView.getParent();
             if (parent != null) {
                 parent.removeView(fragment.mFragmentView);
                 fragment.onDetach();
             }
+            mReusableList.add(fragmentItem);
         }
-        fragment.setActivity(null);
+
         mFragmentStack.remove(fragmentItem);
         fragment.isRemoving = false;
         fragment.isFinished = true;

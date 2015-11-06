@@ -25,6 +25,18 @@ public class ChildFragment extends BaseFragment {
     }
 
     @Override
+    public void onResume() {
+        android.util.Log.d("ThoLH", "ChildFragment onResume");
+        super.onResume();
+    }
+
+    @Override
+    public void onPause() {
+        android.util.Log.d("ThoLH", "ChildFragment onPause");
+        super.onPause();
+    }
+
+    @Override
     public void onDetach() {
         super.onDetach();
         android.util.Log.d("ThoLH", "ChildFragment OnDetach");
