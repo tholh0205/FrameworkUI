@@ -23,9 +23,9 @@ public abstract class BaseFragmentPagerAdapter extends PagerAdapter {
     public Object instantiateItem(ViewGroup container, int position) {
         BaseFragment fragment = getItem(position);
         if (container.getChildCount() == 0) {
-            childFragmentManager.showFragment(container, fragment, true);
+            childFragmentManager.showFragment(container, fragment, true, true);
         } else {
-            childFragmentManager.showFragment(container, fragment, false);
+            childFragmentManager.showFragment(container, fragment, false, true);
         }
         return fragment;
     }
@@ -56,7 +56,7 @@ public abstract class BaseFragmentPagerAdapter extends PagerAdapter {
     @Override
     public void destroyItem(ViewGroup container, int position, Object object) {
         if (object instanceof BaseFragment) {
-            childFragmentManager.remove((BaseFragment) object);
+            childFragmentManager.detachFragmentView((BaseFragment) object);
         }
     }
 

@@ -14,6 +14,7 @@
         android:layout_marginLeft="16.0dip"
         android:layout_marginTop="46.0dip"
         android:text="PROFILE FRAGMENT" />
+
     <Button
         android:id="@+id/search_button"
         android:layout_width="wrap_content"
@@ -26,6 +27,5 @@
         android:id="@+id/child_fragment_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#a3c6b9"
         android:translationY="50dp" />
 </LinearLayout>

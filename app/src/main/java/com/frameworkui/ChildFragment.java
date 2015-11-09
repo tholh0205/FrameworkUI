@@ -25,6 +25,18 @@ public class ChildFragment extends BaseFragment {
     }
 
     @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        view.findViewById(R.id.button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getParentFragment().getChildFragmentManager().remove(ChildFragment.this);
+            }
+        });
+
+    }
+
+    @Override
     public void onResume() {
         android.util.Log.d("ThoLH", "ChildFragment onResume");
         super.onResume();

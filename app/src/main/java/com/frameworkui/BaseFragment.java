@@ -31,10 +31,15 @@ public class BaseFragment {
     private Toolbar mToolbar = null;
     protected Bundle mArguments = null;
     private BaseFragmentActivity mBaseActivity = null;
+    BaseFragment mParentFragment;
     private ChildFragmentManager mChildFragmentManager = new ChildFragmentManager();
 
     public ChildFragmentManager getChildFragmentManager() {
         return mChildFragmentManager;
+    }
+
+    public BaseFragment getParentFragment() {
+        return mParentFragment;
     }
 
     //Fragment Result Data
@@ -48,15 +53,18 @@ public class BaseFragment {
     }
 
     public BaseFragment() {
+        mChildFragmentManager.mParentFragment = this;
     }
 
     public BaseFragment(Bundle arguments) {
         this.mArguments = arguments;
+        mChildFragmentManager.mParentFragment = this;
     }
 
     public BaseFragment(BaseFragmentActivity baseActivity, Bundle arguments) {
         this.mBaseActivity = baseActivity;
         this.mArguments = arguments;
+        mChildFragmentManager.mParentFragment = this;
     }
 
     public void setActivity(BaseFragmentActivity baseActivity) {

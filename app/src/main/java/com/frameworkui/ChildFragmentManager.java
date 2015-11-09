@@ -19,17 +19,29 @@ public class ChildFragmentManager {
     Bundle mSavedInstanceState;
     private BaseFragment mCurrentFragment; //It's only use in main tab
     private Handler mHandlerUI = new Handler(Looper.getMainLooper());
+    BaseFragment mParentFragment;
 
     public void showFragment(ViewGroup containerView, BaseFragment fragment) {
-        showFragment(containerView, fragment, true);
+        showFragment(containerView, fragment, true, false);
     }
 
-    public void showFragment(final ViewGroup containerView, final BaseFragment fragment, final boolean moveToResume) {
+    public void showFragment(final ViewGroup containerView, final BaseFragment fragment, final boolean moveToResume, boolean checkAdded) {
         try {
             if (fragment == null || containerView == null) {
                 return;
             }
-            mChildFragments.add(fragment);
+            boolean itemAdded = false;
+            if (checkAdded) {
+                for (BaseFragment f : mChildFragments) {
+                    itemAdded = f == fragment;
+                    if (itemAdded)
+                        break;
+                }
+            }
+            if (!itemAdded) {
+                mChildFragments.add(fragment);
+            }
+            fragment.mParentFragment = mParentFragment;
             fragment.setActivity(mActivity);
             fragment.onCreate(mSavedInstanceState);
             fragment.onActivityCreated(mSavedInstanceState);
@@ -120,6 +132,29 @@ public class ChildFragmentManager {
 
     public void setCurrentFragment(BaseFragment fragment) {
         this.mCurrentFragment = fragment;
+    }
+
+    public void detachFragmentView(BaseFragment fragment) {
+        try {
+            if (fragment == null) {
+                return;
+            }
+            if (!fragment.isPaused)
+                fragment.onPause();
+            else {
+                ViewParent parent = fragment.getView().getParent();
+                if (parent != null && ViewGroup.class.isInstance(parent)) {
+                    try {
+                        ((ViewGroup) parent).removeView(fragment.getView());
+                        fragment.onDetach();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 }

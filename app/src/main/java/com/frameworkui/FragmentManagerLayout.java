@@ -114,12 +114,14 @@ public class FragmentManagerLayout extends FrameLayout {
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
-        return !(!mAnimationInProgress) || onTouchEvent(ev);
+        boolean hasFragmentBelow = mFragmentStack.size() > 1 ? (mFragmentStack.get(mFragmentStack.size() - 2).getFragment() != null ? true : false) : false;
+        if (hasFragmentBelow)
+            return !(!mAnimationInProgress) || onTouchEvent(ev);
+        return false;
     }
 
     @Override
     public void requestDisallowInterceptTouchEvent(boolean disallowIntercept) {
-        android.util.Log.d("ThoLH", "requestDisallowInterceptTouchEvent " + disallowIntercept);
         onTouchEvent(null);
         super.requestDisallowInterceptTouchEvent(disallowIntercept);
     }
@@ -262,9 +264,8 @@ public class FragmentManagerLayout extends FrameLayout {
         layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT;
         layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT;
         fragmentView.setLayoutParams(layoutParams);
-
-        lastFragment.onResume();
-        lastFragment.onSetupActionBar();
+//        lastFragment.onResume();
+//        lastFragment.onSetupActionBar();
 
         //AndroidUtilities.lockOrientation(parentActivity);
     }
@@ -300,7 +301,7 @@ public class FragmentManagerLayout extends FrameLayout {
             lastFragment.onSetupActionBar();
         } else {
             BaseFragment lastFragment = mFragmentStack.get(mFragmentStack.size() - 2).getFragment();
-            lastFragment.onPause();
+//            lastFragment.onPause();
             if (lastFragment.mFragmentView != null && !isKeepBelowItem) {
                 ViewGroup parent = (ViewGroup) lastFragment.mFragmentView.getParent();
                 if (parent != null) {
@@ -682,6 +683,7 @@ public class FragmentManagerLayout extends FrameLayout {
         fragment.isFinished = true;
         mContainerViewBack.setVisibility(View.GONE);
         bringChildToFront(mContainerView);
+        mContainerView.requestFocusFromTouch();
         mContainerViewBack.removeAllViews();
         resetAnimationCheck(false);
         if (fragmentItem.mRequestCode > 0) {
@@ -744,6 +746,11 @@ public class FragmentManagerLayout extends FrameLayout {
     }
 
     public void onDestroy() {
+        for (FragmentData.FragmentItem fragmentItem : mFragmentStack) {
+            if (fragmentItem != null && fragmentItem.getFragment() != null) {
+                fragmentItem.getFragment().onDestroy();
+            }
+        }
         if (mContainerView != null) {
             mContainerView.removeAllViews();
             mContainerView = null;

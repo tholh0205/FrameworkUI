@@ -30,8 +30,6 @@ public class MainFragment extends BaseFragment implements BaseFragment.SingleIns
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (savedInstanceState != null)
-            android.util.Log.d("ThoLH", "savedInstanceState = " + savedInstanceState + "  MainFragment = " + savedInstanceState.getString("MainFragment"));
     }
 
     @Override
@@ -54,6 +52,11 @@ public class MainFragment extends BaseFragment implements BaseFragment.SingleIns
         super.onViewCreated(view, savedInstanceState);
         mViewPager = (ViewPager) view.findViewById(R.id.tabs);
         mViewPager.setAdapter(new TabsAdapter(getChildFragmentManager()));
+        if (savedInstanceState != null) {
+            if (savedInstanceState.containsKey("CurrentPosition")) {
+                mViewPager.setCurrentItem(savedInstanceState.getInt("CurrentPosition"));
+            }
+        }
         final TabLayout tabLayout = (TabLayout) view.findViewById(R.id.tab_layout);
         tabLayout.setupWithViewPager(mViewPager);
         mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
@@ -120,7 +123,7 @@ public class MainFragment extends BaseFragment implements BaseFragment.SingleIns
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putString("MainFragment", "ThoLH1");
+        outState.putInt("CurrentPosition", mViewPager.getCurrentItem());
     }
 
     @Override
