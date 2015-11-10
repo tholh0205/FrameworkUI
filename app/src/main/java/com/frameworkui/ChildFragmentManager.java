@@ -157,4 +157,10 @@ public class ChildFragmentManager {
         }
     }
 
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        if (mChildFragments != null && !mChildFragments.isEmpty()) {
+            mChildFragments.get(mChildFragments.size() - 1).onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+    }
+
 }

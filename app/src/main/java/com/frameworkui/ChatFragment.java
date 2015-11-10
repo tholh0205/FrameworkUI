@@ -1,10 +1,14 @@
 package com.frameworkui;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.view.Gravity;
@@ -40,6 +44,10 @@ public class ChatFragment extends BaseFragment implements BaseFragment.ReusableF
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         setHasMenu(true);
         mFragmentView = inflater.inflate(R.layout.chat_fragment, container, false);
+//        if (Build.VERSION.SDK_INT >= 23) {
+//            getActivity().requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, 1234);
+//        }
+
         mDrawerLayout = (DrawerLayout) mFragmentView.findViewById(R.id.chat_drawer);
 //        mFragmentView.findViewById(R.id.button).setOnClickListener(new View.OnClickListener() {
 //            @Override
@@ -57,6 +65,12 @@ public class ChatFragment extends BaseFragment implements BaseFragment.ReusableF
             }
         });
         return mFragmentView;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        android.util.Log.d("ThoLH", "requestCode " + requestCode);
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
     @Override

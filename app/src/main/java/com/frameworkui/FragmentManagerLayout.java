@@ -4,6 +4,10 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.AttributeSet;
@@ -44,6 +48,7 @@ public class FragmentManagerLayout extends FrameLayout {
     private boolean mBeginTrackingSent = false;
     private VelocityTracker mVelocityTracker;
     private int mStartedTrackingPointerId;
+    private float mInnerTranslationX = 0F;
 
     public FragmentManagerLayout(Context context) {
         super(context);
@@ -153,7 +158,7 @@ public class FragmentManagerLayout extends FrameLayout {
                     } else if (mStartedTracking) {
                         if (!mBeginTrackingSent) {
                             if (getBaseActivity().getCurrentFocus() != null) {
-//                                AndroidUtilities.hideKeyboard(parentActivity.getCurrentFocus());
+                                Utils.hideKeyboard(getBaseActivity().getCurrentFocus());
                             }
 //                            BaseFragment currentFragment = mFragmentStack.get(mFragmentStack.size() - 1).getFragment();
 //                            currentFragment.onBeginSlide();
@@ -175,7 +180,7 @@ public class FragmentManagerLayout extends FrameLayout {
                             prepareForMoving(ev);
                             if (!mBeginTrackingSent) {
                                 if (((Activity) getContext()).getCurrentFocus() != null) {
-//                                    AndroidUtilities.hideKeyboard(((Activity) getContext()).getCurrentFocus());
+                                    Utils.hideKeyboard(((Activity) getContext()).getCurrentFocus());
                                 }
                                 mBeginTrackingSent = true;
                             }
@@ -192,12 +197,14 @@ public class FragmentManagerLayout extends FrameLayout {
                             distToMove = mContainerView.getMeasuredWidth() - x;
                             animatorSet.playTogether(
                                     ObjectAnimator.ofFloat(mContainerView, "translationX", mContainerView.getMeasuredWidth())
+//                                    ObjectAnimator.ofFloat(mContainerViewBack, "translationX", 0.0f)
 //                                    ObjectAnimatorProxy.ofFloat(this, "innerTranslationX", (float) mContainerView.getMeasuredWidth())
                             );
                         } else {
                             distToMove = x;
                             animatorSet.playTogether(
                                     ObjectAnimator.ofFloat(mContainerView, "translationX", 0)
+//                                    ObjectAnimator.ofFloat(mContainerViewBack, "translationX", -(mContainerViewBack.getMeasuredWidth() / 2))
 //                                    ObjectAnimatorProxy.ofFloat(this, "innerTranslationX", 0.0f)
                             );
                         }
@@ -295,6 +302,7 @@ public class FragmentManagerLayout extends FrameLayout {
             mContainerViewBack = temp;
             mContainerView.setVisibility(View.VISIBLE);
             bringChildToFront(mContainerView);
+            mContainerView.setVisibility(View.VISIBLE);
 
             lastFragment = mFragmentStack.get(mFragmentStack.size() - 1).getFragment();
             lastFragment.onResume();
@@ -683,7 +691,7 @@ public class FragmentManagerLayout extends FrameLayout {
         fragment.isFinished = true;
         mContainerViewBack.setVisibility(View.GONE);
         bringChildToFront(mContainerView);
-        mContainerView.requestFocusFromTouch();
+        mContainerView.setVisibility(View.VISIBLE);
         mContainerViewBack.removeAllViews();
         resetAnimationCheck(false);
         if (fragmentItem.mRequestCode > 0) {
@@ -762,4 +770,35 @@ public class FragmentManagerLayout extends FrameLayout {
         this.removeAllViews();
     }
 
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        if (mFragmentStack != null && !mFragmentStack.isEmpty()) {
+            FragmentData.FragmentItem fragmentItem = mFragmentStack.get(mFragmentStack.size() - 1);
+            if (fragmentItem != null && fragmentItem.getFragment() != null) {
+                fragmentItem.getFragment().onRequestPermissionsResult(requestCode, permissions, grantResults);
+            }
+        }
+    }
+
+    public void setInnerTranslationX(float innerTranslationX) {
+        this.mInnerTranslationX = innerTranslationX;
+        invalidate();
+    }
+
+    @Override
+    protected boolean drawChild(Canvas canvas, View child, long drawingTime) {
+        int width = getWidth() - getPaddingLeft() - getPaddingRight();
+        int translationX = (int) mInnerTranslationX - getPaddingRight();
+        final boolean result = super.drawChild(canvas, child, drawingTime);
+
+        if (!FragmentAnimationUtils.isRunning()) {
+            if (translationX != 0) {
+                if (child == mContainerViewBack) {
+                    float backTranslationX = -(width - translationX) / 2;
+                    ViewHelper.setTranslationX(child, backTranslationX);
+                }
+            }
+        }
+
+        return result;
+    }
 }

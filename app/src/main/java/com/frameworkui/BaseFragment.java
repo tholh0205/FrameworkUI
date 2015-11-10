@@ -272,6 +272,12 @@ public class BaseFragment {
 
     }
 
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        if (mChildFragmentManager != null) {
+            mChildFragmentManager.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+    }
+
     public boolean isEnableSwipeBack() {
         return true;
     }
