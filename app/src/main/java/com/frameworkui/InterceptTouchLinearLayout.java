@@ -33,22 +33,25 @@ public class InterceptTouchLinearLayout extends LinearLayout {
 
     @Override
     public boolean onTouchEvent(MotionEvent ev) {
-        final int action = MotionEventCompat.getActionMasked(ev);
-        if (action == MotionEvent.ACTION_DOWN) {
-            mEatingTouch = false;
-        }
-
-        if (!mEatingTouch) {
-            final boolean handled = super.onTouchEvent(ev);
-            if (action == MotionEvent.ACTION_DOWN && !handled) {
-                mEatingTouch = true;
+        if (Utils.USE_SLIDE_TO_BACK) {
+            final int action = MotionEventCompat.getActionMasked(ev);
+            if (action == MotionEvent.ACTION_DOWN) {
+                mEatingTouch = false;
             }
-        }
 
-        if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL) {
-            mEatingTouch = false;
-        }
+            if (!mEatingTouch) {
+                final boolean handled = super.onTouchEvent(ev);
+                if (action == MotionEvent.ACTION_DOWN && !handled) {
+                    mEatingTouch = true;
+                }
+            }
 
-        return true;
+            if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL) {
+                mEatingTouch = false;
+            }
+
+            return true;
+        }
+        return super.onTouchEvent(ev);
     }
 }

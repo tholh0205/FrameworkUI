@@ -11,6 +11,8 @@ import android.view.inputmethod.InputMethodManager;
  */
 public class Utils {
 
+    public static final boolean USE_SLIDE_TO_BACK = Build.VERSION.SDK_INT >= 11;
+
     public static int sStatusBarHeight = 0;
 
     public static final void setLayerType(View view, int layerType, Paint paint) {

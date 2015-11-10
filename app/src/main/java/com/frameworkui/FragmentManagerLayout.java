@@ -119,9 +119,11 @@ public class FragmentManagerLayout extends FrameLayout {
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
-        boolean hasFragmentBelow = mFragmentStack.size() > 1 ? (mFragmentStack.get(mFragmentStack.size() - 2).getFragment() != null ? true : false) : false;
-        if (hasFragmentBelow)
-            return !(!mAnimationInProgress) || onTouchEvent(ev);
+        if (Utils.USE_SLIDE_TO_BACK) {
+            boolean hasFragmentBelow = mFragmentStack.size() > 1 ? (mFragmentStack.get(mFragmentStack.size() - 2).getFragment() != null ? true : false) : false;
+            if (hasFragmentBelow)
+                return !(!mAnimationInProgress) || onTouchEvent(ev);
+        }
         return false;
     }
 
