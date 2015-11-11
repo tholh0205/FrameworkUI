@@ -127,8 +127,10 @@ public class FragmentManagerLayout extends FrameLayout {
 
     public void onStop() {
         try {
-            if (mFragmentStack.size() > 0) {
-                mFragmentStack.get(mFragmentStack.size() - 1).getFragment().onStop();
+            for (FragmentData.FragmentItem fragmentItem : mFragmentStack) {
+                if (fragmentItem != null && fragmentItem.getFragment() != null) {
+                    fragmentItem.getFragment().onStop();
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();

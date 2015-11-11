@@ -46,6 +46,12 @@ public abstract class BaseFragmentPagerAdapter extends PagerAdapter {
                 childFragmentManager.setCurrentFragment(fragment);
             }
         }
+
+        if (childFragmentManager.mCurrentFragment == null) {
+            BaseFragment fragment = (BaseFragment) object;
+            mCurrentPosition = position;
+            childFragmentManager.setCurrentFragment(fragment);
+        }
     }
 
     @Override

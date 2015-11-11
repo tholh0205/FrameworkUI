@@ -17,8 +17,8 @@ public class ChildFragmentManager {
     private ArrayList<BaseFragment> mChildFragments = new ArrayList<>();
     BaseFragmentActivity mActivity;
     Bundle mSavedInstanceState;
-    private BaseFragment mCurrentFragment; //It's only use in main tab
-    private Handler mHandlerUI = new Handler(Looper.getMainLooper());
+    BaseFragment mCurrentFragment; //It's only use in main tab
+    //    private Handler mHandlerUI = new Handler(Looper.getMainLooper());
     BaseFragment mParentFragment;
 
     public void showFragment(ViewGroup containerView, BaseFragment fragment) {
@@ -61,8 +61,11 @@ public class ChildFragmentManager {
             layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT;
             layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT;
             fragmentView.setLayoutParams(layoutParams);
-            if (moveToResume)
+
+            fragment.onStart();
+            if (moveToResume) {
                 fragment.onResume();
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -75,9 +78,10 @@ public class ChildFragmentManager {
             }
             if (!fragment.isPaused)
                 fragment.onPause();
-            if (!BaseFragment.SingleInstance.class.isInstance(fragment))
+            if (!BaseFragment.SingleInstance.class.isInstance(fragment)) {
+                fragment.onStop();
                 fragment.onDestroy();
-            else {
+            } else {
                 ViewParent parent = fragment.getView().getParent();
                 if (parent != null && ViewGroup.class.isInstance(parent)) {
                     try {
@@ -115,6 +119,13 @@ public class ChildFragmentManager {
         for (BaseFragment fragment : mChildFragments) {
             if (!fragment.isPaused)
                 fragment.onPause();
+        }
+    }
+
+    public void onStop() {
+        for (BaseFragment fragment : mChildFragments) {
+            if (!fragment.isStopped)
+                fragment.onStop();
         }
     }
 

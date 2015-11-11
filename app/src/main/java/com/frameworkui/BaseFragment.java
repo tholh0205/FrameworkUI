@@ -27,6 +27,8 @@ public class BaseFragment {
     boolean isRemoving = false;
     boolean isPaused = false;
     boolean isAdded = false;
+    boolean isStopped = false;
+    boolean isStarted = false;
     public View mFragmentView = null;
     private Toolbar mToolbar = null;
     protected Bundle mArguments = null;
@@ -168,6 +170,7 @@ public class BaseFragment {
 
     public void onStart() {
         Log("onStart");
+        isStarted = true;
     }
 
     public void onNewIntent() {
@@ -236,6 +239,8 @@ public class BaseFragment {
     public void onResume() {
         isResumed = true;
         isPaused = false;
+        isStopped = false;
+        isStarted = true;
         mChildFragmentManager.onResume();
         Log("onResume");
     }
@@ -249,6 +254,9 @@ public class BaseFragment {
 
     public void onStop() {
         Log("onStop");
+        isStopped = true;
+        isStarted = false;
+        mChildFragmentManager.onStop();
     }
 
     public void onDestroyView() {
