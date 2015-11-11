@@ -90,6 +90,7 @@ public class BaseFragment {
         return mToolbar;
     }
 
+
     public void onSetupActionBar() {
         getToolbar();
         if (mToolbar != null && mBaseActivity != null) {
@@ -145,6 +146,7 @@ public class BaseFragment {
     }
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        Log("onCreateView");
         return null;
     }
 
@@ -161,24 +163,33 @@ public class BaseFragment {
         isFinished = false;
         isResumed = false;
         mChildFragmentManager.mSavedInstanceState = savedInstanceState;
+        Log("onCreate");
+    }
+
+    public void onStart() {
+        Log("onStart");
     }
 
     public void onNewIntent() {
+        Log("onNewIntent");
     }
 
     public void onAttach(Activity activity) {
         isAdded = true;
         isPaused = false;
         isResumed = false;
+        Log("onAttach");
     }
 
     public void onDetach() {
         isAdded = false;
         isPaused = false;
         isResumed = false;
+        Log("onDetach");
     }
 
     public void onActivityCreated(Bundle savedInstanceState) {
+        Log("onActivityCreated");
     }
 
     protected void clearViews() {
@@ -192,6 +203,7 @@ public class BaseFragment {
                     e.printStackTrace();
                 }
             }
+            onDestroyView();
             mFragmentView = null;
         }
     }
@@ -204,6 +216,7 @@ public class BaseFragment {
     }
 
     public boolean onBackPressed() {
+        Log("onBackPressed");
         return finishFragment(true);
 //        return false;
     }
@@ -224,23 +237,36 @@ public class BaseFragment {
         isResumed = true;
         isPaused = false;
         mChildFragmentManager.onResume();
+        Log("onResume");
     }
 
     public void onPause() {
         isResumed = false;
         isPaused = true;
         mChildFragmentManager.onPause();
+        Log("onPause");
+    }
+
+    public void onStop() {
+        Log("onStop");
+    }
+
+    public void onDestroyView() {
+        Log("onDestroyView");
     }
 
     public void onDestroy() {
         mChildFragmentManager.onDestroy();
         clearViews();
+        Log("onDestroy");
     }
 
     public void onOpenAnimationStart() {
+        Log("onOpenAnimationStart");
     }
 
     public void onOpenAnimationEnd() {
+        Log("onOpenAnimationEnd");
     }
 
     public void onSaveInstanceState(Bundle outState) {
@@ -251,6 +277,8 @@ public class BaseFragment {
         if (mArguments != null)
             outState.putBundle("mArguments", mArguments);
         mChildFragmentManager.onSaveInstanceState(outState);
+
+        Log("onSaveInstanceState");
     }
 
 //    public void onRestoreInstanceState(Bundle savedInstanceState) {
@@ -276,6 +304,11 @@ public class BaseFragment {
         if (mChildFragmentManager != null) {
             mChildFragmentManager.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
+    }
+
+    private void Log(String message) {
+        if (Utils.IS_DEBUGGING)
+            android.util.Log.d(this.getClass().getSimpleName(), message);
     }
 
     public boolean isEnableSwipeBack() {

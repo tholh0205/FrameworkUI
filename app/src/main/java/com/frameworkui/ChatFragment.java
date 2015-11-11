@@ -76,7 +76,6 @@ public class ChatFragment extends BaseFragment implements BaseFragment.ReusableF
     @Override
     public void onNewIntent() {
         super.onNewIntent();
-        android.util.Log.d("ThoLH", "ChatFragment onNewIntent " + getArguments());
     }
 
     @Override
@@ -109,7 +108,6 @@ public class ChatFragment extends BaseFragment implements BaseFragment.ReusableF
     @Override
     public void onResume() {
         super.onResume();
-        android.util.Log.d("ThoLH", "ChatFragment onResume");
 //        mFragmentView.findViewById(R.id.button).setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View view) {
@@ -122,13 +120,11 @@ public class ChatFragment extends BaseFragment implements BaseFragment.ReusableF
     @Override
     public void onPause() {
         super.onPause();
-        android.util.Log.d("ThoLH", "ChatFragment onPause");
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        android.util.Log.d("ThoLH", "ChatFragment onDestroy");
     }
 
     @Override

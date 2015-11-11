@@ -97,19 +97,16 @@ public class MainFragment extends BaseFragment implements BaseFragment.SingleIns
     @Override
     public void onResume() {
         super.onResume();
-        android.util.Log.d("ThoLH", "MainFragment onResume");
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        android.util.Log.d("ThoLH", "MainFragment onPause");
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        android.util.Log.d("ThoLH", "MainFragment onDestroy");
     }
 
     @Override
@@ -138,7 +135,6 @@ public class MainFragment extends BaseFragment implements BaseFragment.SingleIns
         if (mViewPager != null)
             mViewPager.setVisibility(View.GONE);
         super.onDetach();
-        android.util.Log.d("ThoLH", "MainFragment onDetach");
     }
 
     private class TabsAdapter extends BaseFragmentPagerAdapter {

@@ -2,4 +2,5 @@
 <resources>
     <bool name="use_view_animation">true</bool>
     <bool name="clear_top_from_single_instance_item">true</bool>
+    <bool name="isDebug">true</bool>
 </resources>

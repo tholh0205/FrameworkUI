@@ -5,9 +5,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.AttributeSet;
@@ -40,6 +37,7 @@ public class FragmentManagerLayout extends FrameLayout {
 
     private LinearLayout mContainerViewBack, mContainerView;
     private Bundle mSavedInstanceState;
+    private boolean mAddingOrRemovingFragment = false;
     private boolean mAnimationInProgress = false;
     private boolean mStartedTracking = false;
     private boolean mMaybeStartTracking = false;
@@ -97,6 +95,16 @@ public class FragmentManagerLayout extends FrameLayout {
         }
     }
 
+    public void onStart() {
+        try {
+            if (mFragmentStack.size() > 0) {
+                mFragmentStack.get(mFragmentStack.size() - 1).getFragment().onStart();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public void onResume() {
         try {
             if (mFragmentStack.size() > 0) {
@@ -117,11 +125,21 @@ public class FragmentManagerLayout extends FrameLayout {
         }
     }
 
+    public void onStop() {
+        try {
+            if (mFragmentStack.size() > 0) {
+                mFragmentStack.get(mFragmentStack.size() - 1).getFragment().onStop();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
         if (Utils.USE_SLIDE_TO_BACK) {
             boolean hasFragmentBelow = mFragmentStack.size() > 1 ? (mFragmentStack.get(mFragmentStack.size() - 2).getFragment() != null ? true : false) : false;
-            if (hasFragmentBelow)
+            if (hasFragmentBelow && !mAddingOrRemovingFragment)
                 return !(!mAnimationInProgress) || onTouchEvent(ev);
         }
         return false;
@@ -294,6 +312,7 @@ public class FragmentManagerLayout extends FrameLayout {
                 }
                 mReusableList.add(mFragmentStack.get(mFragmentStack.size() - 1));
             } else {
+                lastFragment.onStop();
                 lastFragment.onDestroy();
                 lastFragment.setActivity(null);
             }
@@ -358,8 +377,9 @@ public class FragmentManagerLayout extends FrameLayout {
 
     public void showFragment(FragmentData.FragmentType fragmentType, Bundle data, int requestCode, boolean noAnimation, final boolean removeLast) {
         try {
-            if (FragmentAnimationUtils.isRunning())
+            if (mAddingOrRemovingFragment || FragmentAnimationUtils.isRunning())
                 return;
+            mAddingOrRemovingFragment = true;
             if (data == null) {
                 data = new Bundle();
             }
@@ -443,6 +463,7 @@ public class FragmentManagerLayout extends FrameLayout {
             layoutParams.width = LinearLayout.LayoutParams.MATCH_PARENT;
             layoutParams.height = LinearLayout.LayoutParams.MATCH_PARENT;
             fragmentView.setLayoutParams(layoutParams);
+            fragmentItem.getFragment().onStart();
             fragmentItem.getFragment().onResume();
             fragmentItem.getFragment().onSetupActionBar();
 
@@ -459,6 +480,8 @@ public class FragmentManagerLayout extends FrameLayout {
                     } else {
                         showFragmentInternalRemoveOld(removeLast, currentFragmentItem);
                     }
+                } else {
+                    mAddingOrRemovingFragment = false;
                 }
                 fragmentItem.getFragment().onOpenAnimationStart();
                 fragmentItem.getFragment().onOpenAnimationEnd();
@@ -476,6 +499,8 @@ public class FragmentManagerLayout extends FrameLayout {
                             } else {
                                 showFragmentInternalRemoveOld(removeLast, currentFragmentItem);
                             }
+                        } else {
+                            mAddingOrRemovingFragment = false;
                         }
                         fragment.onOpenAnimationEnd();
                     }
@@ -489,6 +514,8 @@ public class FragmentManagerLayout extends FrameLayout {
                             } else {
                                 showFragmentInternalRemoveOld(removeLast, currentFragmentItem);
                             }
+                        } else {
+                            mAddingOrRemovingFragment = false;
                         }
                         fragment.onOpenAnimationEnd();
                     }
@@ -516,6 +543,7 @@ public class FragmentManagerLayout extends FrameLayout {
 
     private void showFragmentInternalRemoveOld(boolean removeLastFromStack, FragmentData.FragmentItem fragmentItem) {
         if (fragmentItem == null || fragmentItem.getFragment() == null) {
+            mAddingOrRemovingFragment = false;
             return;
         }
         BaseFragment fragment = fragmentItem.getFragment();
@@ -546,6 +574,7 @@ public class FragmentManagerLayout extends FrameLayout {
 
     public void showLastFragment() {
         try {
+            mAddingOrRemovingFragment = true;
             final FragmentData.FragmentItem fragmentItem = mFragmentStack.isEmpty() ? null : mFragmentStack.get(mFragmentStack.size() - 1);
             if (fragmentItem.getFragment() == null) {
                 fragmentItem.mFragment = fragmentItem.cls.newInstance();
@@ -571,6 +600,7 @@ public class FragmentManagerLayout extends FrameLayout {
             layoutParams.width = LinearLayout.LayoutParams.MATCH_PARENT;
             layoutParams.height = LinearLayout.LayoutParams.MATCH_PARENT;
             fragmentView.setLayoutParams(layoutParams);
+            fragmentItem.getFragment().onStart();
             fragmentItem.getFragment().onResume();
             fragmentItem.getFragment().onSetupActionBar();
 
@@ -585,15 +615,17 @@ public class FragmentManagerLayout extends FrameLayout {
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
+        mAddingOrRemovingFragment = false;
     }
 
     public boolean goToBackStack(boolean animated) {
         try {
-            if (FragmentAnimationUtils.isRunning())
+            if (mAddingOrRemovingFragment || FragmentAnimationUtils.isRunning())
                 return true;
             if (mFragmentStack == null || mFragmentStack.size() < 2) {
                 return false;
             }
+            mAddingOrRemovingFragment = true;
             final FragmentData.FragmentItem topFragmentItem = mFragmentStack.get(mFragmentStack.size() - 1);
             final FragmentData.FragmentItem belowFragmentItem = mFragmentStack.get(mFragmentStack.size() - 2);
             if (topFragmentItem.getFragment() != null) {
@@ -615,7 +647,6 @@ public class FragmentManagerLayout extends FrameLayout {
                 belowFragmentItem.mFragment.setActivity(getBaseActivity());
                 View fragmentView = belowFragmentItem.getFragment().mFragmentView;
                 if (fragmentView == null) {
-                    android.util.Log.d("ThoLH", "goToBackStack belowFragment fragmentView == null");
                     fragmentView = belowFragmentItem.getFragment().onCreateView(getBaseActivity().getLayoutInflater(), null, mSavedInstanceState);
                     belowFragmentItem.getFragment().onViewCreated(fragmentView, mSavedInstanceState);
                 } else {
@@ -677,6 +708,7 @@ public class FragmentManagerLayout extends FrameLayout {
             }
         });
         if (!BaseFragment.ReusableFragment.class.isInstance(fragment)) {
+            fragment.onStop();
             fragment.onDestroy();
             fragment.setActivity(null);
         } else {
@@ -722,6 +754,7 @@ public class FragmentManagerLayout extends FrameLayout {
         ViewHelper.setScaleY(mContainerViewBack, 1f);
         ViewHelper.setTranslationX(mContainerViewBack, 0f);
         ViewHelper.setTranslationY(mContainerViewBack, 0f);
+        mAddingOrRemovingFragment = false;
     }
 
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {

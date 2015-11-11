@@ -58,6 +58,22 @@ public class BaseFragmentActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        if (mFragmentManager != null) {
+            mFragmentManager.onStart();
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (mFragmentManager != null) {
+            mFragmentManager.onStop();
+        }
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
         if (!isCreating) {
