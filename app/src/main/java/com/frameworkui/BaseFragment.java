@@ -277,6 +277,14 @@ public class BaseFragment {
         Log("onOpenAnimationEnd");
     }
 
+    public void onPopAnimationStart() {
+        Log("onPopAnimationStart");
+    }
+
+    public void onPopAnimationEnd() {
+        Log("onPopAnimationEnd");
+    }
+
     public void onSaveInstanceState(Bundle outState) {
         if (outState == null)
             return;
@@ -306,6 +314,10 @@ public class BaseFragment {
 
     public void onLowMemory() {
 
+    }
+
+    public void onBeginSlide() {
+        Log("onBeginSlide");
     }
 
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
