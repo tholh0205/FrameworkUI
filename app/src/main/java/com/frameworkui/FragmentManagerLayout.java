@@ -145,7 +145,7 @@ public class FragmentManagerLayout extends FrameLayout {
         if (Utils.USE_SLIDE_TO_BACK) {
             boolean hasFragmentBelow = mFragmentStack.size() > 1 ? (mFragmentStack.get(mFragmentStack.size() - 2).getFragment() != null ? true : false) : false;
             if (hasFragmentBelow && !mAddingOrRemovingFragment)
-                return !(!mAnimationInProgress) || onTouchEvent(ev);
+                return mAnimationInProgress || onTouchEvent(ev);
         }
         return false;
     }
@@ -386,9 +386,8 @@ public class FragmentManagerLayout extends FrameLayout {
                 data = new Bundle();
             }
 
-            boolean needAnimation = noAnimation ? false : true;
+            boolean needAnimation = !noAnimation;
             boolean isSingleItem = false;
-            boolean isReusableItem = false;
 
             final FragmentData.FragmentItem currentFragmentItem = mFragmentStack.isEmpty() ? null : mFragmentStack.get(mFragmentStack.size() - 1);
 
@@ -408,7 +407,6 @@ public class FragmentManagerLayout extends FrameLayout {
                     if (item.mFragmentType.getTypeId() == fragmentType.getTypeId()) {
                         fragmentItem = item;
                         isSingleItem = false;
-                        isReusableItem = true;
                         break;
                     }
                 }
@@ -418,10 +416,8 @@ public class FragmentManagerLayout extends FrameLayout {
                 fragmentItem = new FragmentData.FragmentItem(fragmentType, data);
             }
 
-            if (!isSingleItem || isReusableItem) {
-                mFragmentStack.add(fragmentItem);
-                mReusableList.remove(fragmentItem);
-            }
+            mFragmentStack.add(fragmentItem);
+            mReusableList.remove(fragmentItem);
 
             if (fragmentItem.getFragment() == null) {
                 fragmentItem.mFragment = fragmentType.getFragmentClass().newInstance();
