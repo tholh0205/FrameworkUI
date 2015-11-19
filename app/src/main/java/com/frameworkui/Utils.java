@@ -2,9 +2,12 @@ package com.frameworkui;
 
 import android.content.Context;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.os.Build;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+
+import java.lang.reflect.Field;
 
 /**
  * Created by ThoLH on 10/02/2015.
@@ -52,6 +55,26 @@ public class Utils {
             return 0;
         }
         return (int) Math.ceil(MainApplication.getInstance().getResources().getDisplayMetrics().density * dp);
+    }
+
+    public static int getViewInset(View view) {
+        if (view == null || Build.VERSION.SDK_INT < 21) {
+            return 0;
+        }
+        try {
+            Field mAttachInfoField = View.class.getDeclaredField("mAttachInfo");
+            mAttachInfoField.setAccessible(true);
+            Object mAttachInfo = mAttachInfoField.get(view);
+            if (mAttachInfo != null) {
+                Field mStableInsetsField = mAttachInfo.getClass().getDeclaredField("mStableInsets");
+                mStableInsetsField.setAccessible(true);
+                Rect insets = (Rect) mStableInsetsField.get(mAttachInfo);
+                return insets.bottom;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
     }
 
 }

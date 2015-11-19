@@ -3,4 +3,5 @@
     <bool name="use_view_animation">true</bool>
     <bool name="clear_top_from_single_instance_item">true</bool>
     <bool name="isDebug">true</bool>
+    <bool name="use_translucent_status">false</bool>
 </resources>

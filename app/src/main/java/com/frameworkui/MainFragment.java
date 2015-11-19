@@ -76,7 +76,6 @@ public class MainFragment extends BaseFragment implements BaseFragment.SingleIns
 
     @Override
     public void onSetupActionBar() {
-        super.onSetupActionBar();
         ActionBar actionBar = (ActionBar) getView().findViewById(R.id.custom_action_bar);
         if (actionBar != null) {
             actionBar.setTitle("Main Fragment");

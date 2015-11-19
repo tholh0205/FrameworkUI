@@ -95,15 +95,15 @@ public class BaseFragment {
 
 
     public void onSetupActionBar() {
-        getToolbar();
-        if (mToolbar != null && mBaseActivity != null) {
-            mBaseActivity.setSupportActionBar(mToolbar);
-            ActionBar actionBar = mBaseActivity.getSupportActionBar();
-            if (actionBar != null) {
-                actionBar.setDisplayHomeAsUpEnabled(true);
-                actionBar.setHomeAsUpIndicator(getUpIndicator());
-            }
-        }
+//        getToolbar();
+//        if (mToolbar != null && mBaseActivity != null) {
+//            mBaseActivity.setSupportActionBar(mToolbar);
+//            ActionBar actionBar = mBaseActivity.getSupportActionBar();
+//            if (actionBar != null) {
+//                actionBar.setDisplayHomeAsUpEnabled(true);
+//                actionBar.setHomeAsUpIndicator(getUpIndicator());
+//            }
+//        }
 
         mActionBar = (com.frameworkui.actionbar.ActionBar) mFragmentView.findViewById(R.id.custom_action_bar);
         if (mActionBar != null) {

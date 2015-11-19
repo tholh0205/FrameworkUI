@@ -18,6 +18,7 @@ import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowInsets;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
@@ -551,8 +552,8 @@ public class FragmentManagerLayout extends FrameLayout {
         MainApplication.getInstance().runOnUIThread(new Runnable() {
             @Override
             public void run() {
-                if (getBaseActivity() != null)
-                    getBaseActivity().supportInvalidateOptionsMenu();
+//                if (getBaseActivity() != null)
+//                    getBaseActivity().supportInvalidateOptionsMenu();
             }
         });
         if (removeLastFromStack) {
@@ -703,8 +704,8 @@ public class FragmentManagerLayout extends FrameLayout {
         MainApplication.getInstance().runOnUIThread(new Runnable() {
             @Override
             public void run() {
-                if (getBaseActivity() != null)
-                    getBaseActivity().supportInvalidateOptionsMenu();
+//                if (getBaseActivity() != null)
+//                    getBaseActivity().supportInvalidateOptionsMenu();
             }
         });
         if (!BaseFragment.ReusableFragment.class.isInstance(fragment)) {

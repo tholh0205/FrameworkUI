@@ -11,6 +11,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -91,16 +92,10 @@ public class ChatFragment extends BaseFragment implements BaseFragment.ReusableF
             if (mMenu == null) {
                 mMenu = actionBar.createMenu();
                 ActionBarMenuItem itemMore = mMenu.addItem(1, getMenuMoreDrawable());
-                itemMore.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        android.util.Log.d("ThoLH", "menu clicked");
-                        mMenu.onMenuButtonPressed();
-                    }
-                });
-                itemMore.addSubItem(2, "Test 1", 0);
+                itemMore.addSubItem(2, "Xoá lịch sử trò chuyện", 0);
                 itemMore.addSubItem(3, "Test 2", 0);
                 itemMore.addSubItem(4, "Test 3", 0);
+//                mMenu.addItem(0, getUpIndicator());
             }
 //            actionBar.setSubtitle("Test Fragment");
         }
@@ -110,6 +105,8 @@ public class ChatFragment extends BaseFragment implements BaseFragment.ReusableF
 //            setTitle("Chat Fragment");
 //            actionBar.setDisplayHomeAsUpEnabled(true);
 //        }
+
+        getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
     }
 
     @Override
@@ -131,6 +128,7 @@ public class ChatFragment extends BaseFragment implements BaseFragment.ReusableF
 
     @Override
     public void onResume() {
+        getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
         super.onResume();
 //        mFragmentView.findViewById(R.id.button).setOnClickListener(new View.OnClickListener() {
 //            @Override

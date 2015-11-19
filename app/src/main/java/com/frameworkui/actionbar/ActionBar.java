@@ -41,7 +41,7 @@ public class ActionBar extends FrameLayout {
     private View actionModeTop;
     private ActionBarMenu menu;
     private ActionBarMenu actionMode;
-    private boolean occupyStatusBar = Build.VERSION.SDK_INT >= 21;
+    private boolean occupyStatusBar = MainApplication.getInstance().getAppContext().getResources().getBoolean(R.bool.use_translucent_status);
 
     private boolean allowOverlayTitle;
     private CharSequence lastTitle;
@@ -142,7 +142,7 @@ public class ActionBar extends FrameLayout {
         titleTextView.setMaxLines(1);
         titleTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
         titleTextView.setEllipsize(TextUtils.TruncateAt.END);
-        titleTextView.setTypeface(Typeface.createFromAsset(getContext().getAssets(), "fonts/rmedium.ttf"));
+//        titleTextView.setTypeface(Typeface.createFromAsset(getContext().getAssets(), "fonts/rmedium.ttf"));
         LayoutParams layoutParams = new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         layoutParams.gravity = Gravity.LEFT | Gravity.TOP;
         addView(titleTextView, layoutParams);

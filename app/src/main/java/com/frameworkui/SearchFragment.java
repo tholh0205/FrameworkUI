@@ -8,8 +8,11 @@ import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 
 import com.frameworkui.actionbar.ActionBar;
+import com.frameworkui.actionbar.ActionBarMenu;
+import com.frameworkui.actionbar.ActionBarMenuItem;
 
 /**
  * Created by ThoLH on 10/26/15.
@@ -60,7 +63,7 @@ public class SearchFragment extends BaseFragment {
             @Override
             public void onClick(View v) {
                 AlertDialogFragment dialogFragment = new AlertDialogFragment();
-                dialogFragment.show(getActivity().getSupportFragmentManager(), "1234");
+//                dialogFragment.show(getActivity().getSupportFragmentManager(), "1234");
             }
         });
     }
@@ -73,6 +76,14 @@ public class SearchFragment extends BaseFragment {
         if (actionBar != null) {
             actionBar.setTitle("Search Fragment");
             actionBar.setBackButtonDrawable(getUpIndicator());
+            ActionBarMenu menu = actionBar.createMenu();
+            menu.addItem(1, getMenuMoreDrawable()).setIsSearchField(true).setActionBarMenuItemSearchListener(new ActionBarMenuItem.ActionBarMenuItemSearchListener() {
+                @Override
+                public void onTextChanged(EditText editText) {
+                    super.onTextChanged(editText);
+                    android.util.Log.d("ThoLH", "setIsSearchField " + editText.getText());
+                }
+            });
         }
     }
 }

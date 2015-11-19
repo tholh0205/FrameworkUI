@@ -4,36 +4,44 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <com.frameworkui.widget.ResizeFrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@drawable/white"
-        android:orientation="vertical">
+        android:layout_height="match_parent">
 
-        <include layout="@layout/layout_action_bar" />
-
-        <EditText
-            android:id="@+id/edt_message"
-            android:layout_width="match_parent"
-            android:layout_height="48dip"
-            android:layout_alignParentBottom="true" />
-
-        <ListView
-            android:id="@+id/listView"
+        <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_above="@+id/edt_message"
-            android:layout_below="@+id/custom_action_bar" />
+            android:background="@drawable/white"
+            android:fitsSystemWindows="true"
+            android:focusableInTouchMode="true"
+            android:orientation="vertical">
 
-        <Button
-            android:id="@+id/button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/custom_action_bar"
-            android:layout_margin="16.0dip"
-            android:text="CHAT FRAGMENT" />
+            <EditText
+                android:id="@+id/edt_message"
+                android:layout_width="match_parent"
+                android:layout_height="48dip"
+                android:layout_alignParentBottom="true" />
 
-    </RelativeLayout>
+            <ListView
+                android:id="@+id/listView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_above="@+id/edt_message"
+                android:layout_below="@+id/custom_action_bar"
+                android:focusableInTouchMode="true" />
+
+            <Button
+                android:id="@+id/button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/custom_action_bar"
+                android:layout_margin="16.0dip"
+                android:text="CHAT FRAGMENT" />
+
+        </RelativeLayout>
+
+        <include layout="@layout/layout_action_bar" />
+    </com.frameworkui.widget.ResizeFrameLayout>
 
     <fragment
         android:id="@+id/chat_right_menu"
