@@ -8,7 +8,6 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
-import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -34,6 +33,8 @@ public class BaseFragment {
     protected Bundle mArguments = null;
     private BaseFragmentActivity mBaseActivity = null;
     BaseFragment mParentFragment;
+    private com.frameworkui.actionbar.ActionBar mActionBar;
+
     private ChildFragmentManager mChildFragmentManager = new ChildFragmentManager();
 
     public ChildFragmentManager getChildFragmentManager() {
@@ -102,6 +103,12 @@ public class BaseFragment {
                 actionBar.setDisplayHomeAsUpEnabled(true);
                 actionBar.setHomeAsUpIndicator(getUpIndicator());
             }
+        }
+
+        mActionBar = (com.frameworkui.actionbar.ActionBar) mFragmentView.findViewById(R.id.custom_action_bar);
+        if (mActionBar != null) {
+            mActionBar.setItemsBackground(R.drawable.bar_selector);
+            mActionBar.parentFragment = this;
         }
     }
 

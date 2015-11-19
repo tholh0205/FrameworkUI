@@ -4,16 +4,14 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBar;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
+
+import com.frameworkui.actionbar.ActionBar;
 
 /**
  * Created by ThoLH on 10/05/2015.
@@ -79,10 +77,17 @@ public class MainFragment extends BaseFragment implements BaseFragment.SingleIns
     @Override
     public void onSetupActionBar() {
         super.onSetupActionBar();
-        ActionBar actionBar = getActivity().getSupportActionBar();
+        ActionBar actionBar = (ActionBar) getView().findViewById(R.id.custom_action_bar);
         if (actionBar != null) {
             actionBar.setTitle("Main Fragment");
+            actionBar.setBackButtonDrawable(getUpIndicator());
+            actionBar.setSubtitle("Test Fragment");
         }
+//        super.onSetupActionBar();
+//        ActionBar actionBar = getActivity().getSupportActionBar();
+//        if (actionBar != null) {
+//            actionBar.setTitle("Main Fragment");
+//        }
     }
 
     @Override

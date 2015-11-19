@@ -10,7 +10,7 @@
         android:background="@drawable/white"
         android:orientation="vertical">
 
-        <include layout="@layout/toolbar" />
+        <include layout="@layout/layout_action_bar" />
 
         <EditText
             android:id="@+id/edt_message"
@@ -23,13 +23,13 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_above="@+id/edt_message"
-            android:layout_below="@+id/toolbar" />
+            android:layout_below="@+id/custom_action_bar" />
 
         <Button
             android:id="@+id/button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/toolbar"
+            android:layout_below="@+id/custom_action_bar"
             android:layout_margin="16.0dip"
             android:text="CHAT FRAGMENT" />
 

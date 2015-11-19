@@ -9,6 +9,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.frameworkui.actionbar.ActionBar;
+
 /**
  * Created by ThoLH on 10/26/15.
  */
@@ -66,6 +68,11 @@ public class SearchFragment extends BaseFragment {
     @Override
     public void onSetupActionBar() {
         super.onSetupActionBar();
-        setTitle("SearchFragment");
+//        setTitle("SearchFragment");
+        ActionBar actionBar = (ActionBar) getView().findViewById(R.id.custom_action_bar);
+        if (actionBar != null) {
+            actionBar.setTitle("Search Fragment");
+            actionBar.setBackButtonDrawable(getUpIndicator());
+        }
     }
 }

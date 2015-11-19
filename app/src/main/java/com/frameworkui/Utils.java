@@ -17,6 +17,10 @@ public class Utils {
 
     public static int sStatusBarHeight = 0;
 
+    public static boolean isTablet() {
+        return false;
+    }
+
     public static final void setLayerType(View view, int layerType, Paint paint) {
         if (Build.VERSION.SDK_INT >= 11) {
             view.setLayerType(layerType, paint);
@@ -33,6 +37,13 @@ public class Utils {
             if (view.getWindowToken() != null) {
                 imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
             }
+        }
+    }
+
+    public static void showKeyboard(View view) {
+        if (view != null) {
+            InputMethodManager imm = (InputMethodManager) view.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
         }
     }
 

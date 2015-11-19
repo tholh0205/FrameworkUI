@@ -10,6 +10,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.AttributeSet;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -415,9 +416,10 @@ public class FragmentManagerLayout extends FrameLayout {
             if (fragmentItem == null) {
                 fragmentItem = new FragmentData.FragmentItem(fragmentType, data);
             }
-
-            mFragmentStack.add(fragmentItem);
-            mReusableList.remove(fragmentItem);
+            if (!isSingleItem) {
+                mFragmentStack.add(fragmentItem);
+                mReusableList.remove(fragmentItem);
+            }
 
             if (fragmentItem.getFragment() == null) {
                 fragmentItem.mFragment = fragmentType.getFragmentClass().newInstance();

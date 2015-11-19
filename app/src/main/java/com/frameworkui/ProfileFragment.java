@@ -1,14 +1,12 @@
 package com.frameworkui;
 
-import android.app.Activity;
-import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.ActionBar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+
+import com.frameworkui.actionbar.ActionBar;
 
 /**
  * Created by ThoLH on 10/05/2015.
@@ -44,10 +42,15 @@ public class ProfileFragment extends BaseFragment {
     @Override
     public void onSetupActionBar() {
         super.onSetupActionBar();
-        ActionBar actionBar = getActivity().getSupportActionBar();
+//        ActionBar actionBar = getActivity().getSupportActionBar();
+//        if (actionBar != null) {
+//            setTitle("Profile Fragment");
+//            actionBar.setDisplayHomeAsUpEnabled(true);
+//        }
+        ActionBar actionBar = (ActionBar) getView().findViewById(R.id.custom_action_bar);
         if (actionBar != null) {
-            setTitle("Profile Fragment");
-            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setTitle("Profile Fragment");
+            actionBar.setBackButtonDrawable(getUpIndicator());
         }
     }
 

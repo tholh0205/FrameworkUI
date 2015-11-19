@@ -1,16 +1,9 @@
 package com.frameworkui;
 
-import android.Manifest;
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -20,8 +13,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.ImageButton;
 import android.widget.ListView;
+
+import com.frameworkui.actionbar.ActionBar;
+import com.frameworkui.actionbar.ActionBarMenu;
+import com.frameworkui.actionbar.ActionBarMenuItem;
 
 /**
  * Created by ThoLH on 10/05/2015.
@@ -30,6 +26,7 @@ public class ChatFragment extends BaseFragment implements BaseFragment.ReusableF
 
     private String[] data = new String[100];
     private DrawerLayout mDrawerLayout;
+    private ActionBarMenu mMenu;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -81,11 +78,38 @@ public class ChatFragment extends BaseFragment implements BaseFragment.ReusableF
     @Override
     public void onSetupActionBar() {
         super.onSetupActionBar();
-        ActionBar actionBar = getActivity().getSupportActionBar();
+        ActionBar actionBar = (ActionBar) getView().findViewById(R.id.custom_action_bar);
         if (actionBar != null) {
-            setTitle("Chat Fragment");
-            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setTitle("Chat Fragment");
+            actionBar.setBackButtonDrawable(getUpIndicator());
+            actionBar.setActionBarMenuOnItemClick(new ActionBar.ActionBarMenuOnItemClick() {
+                @Override
+                public void onItemClick(int id) {
+                    android.util.Log.d("ThoLH", "sub menu clicked " + id);
+                }
+            });
+            if (mMenu == null) {
+                mMenu = actionBar.createMenu();
+                ActionBarMenuItem itemMore = mMenu.addItem(1, getMenuMoreDrawable());
+                itemMore.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        android.util.Log.d("ThoLH", "menu clicked");
+                        mMenu.onMenuButtonPressed();
+                    }
+                });
+                itemMore.addSubItem(2, "Test 1", 0);
+                itemMore.addSubItem(3, "Test 2", 0);
+                itemMore.addSubItem(4, "Test 3", 0);
+            }
+//            actionBar.setSubtitle("Test Fragment");
         }
+//        super.onSetupActionBar();
+//        ActionBar actionBar = getActivity().getSupportActionBar();
+//        if (actionBar != null) {
+//            setTitle("Chat Fragment");
+//            actionBar.setDisplayHomeAsUpEnabled(true);
+//        }
     }
 
     @Override
