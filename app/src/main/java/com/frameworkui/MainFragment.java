@@ -12,6 +12,8 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.frameworkui.actionbar.ActionBar;
+import com.frameworkui.actionbar.ActionBarMenu;
+import com.frameworkui.actionbar.MenuDrawable;
 
 /**
  * Created by ThoLH on 10/05/2015.
@@ -19,6 +21,7 @@ import com.frameworkui.actionbar.ActionBar;
 public class MainFragment extends BaseFragment implements BaseFragment.SingleInstance {
 
     private ViewPager mViewPager;
+    private ActionBarMenu mMenu;
 
     @Override
     public boolean isEnableSwipeBack() {
@@ -32,6 +35,7 @@ public class MainFragment extends BaseFragment implements BaseFragment.SingleIns
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        hasMenu = true;
         mFragmentView = inflater.inflate(R.layout.main_fragment, container, false);
 //        mFragmentView.findViewById(R.id.button).setOnClickListener(new View.OnClickListener() {
 //            @Override
@@ -76,10 +80,11 @@ public class MainFragment extends BaseFragment implements BaseFragment.SingleIns
 
     @Override
     public void onSetupActionBar() {
+        super.onSetupActionBar();
         ActionBar actionBar = (ActionBar) getView().findViewById(R.id.custom_action_bar);
         if (actionBar != null) {
             actionBar.setTitle("Main Fragment");
-            actionBar.setBackButtonDrawable(getUpIndicator());
+            actionBar.setBackButtonDrawable(new MenuDrawable());
             actionBar.setSubtitle("Test Fragment");
         }
 //        super.onSetupActionBar();
@@ -90,8 +95,13 @@ public class MainFragment extends BaseFragment implements BaseFragment.SingleIns
     }
 
     @Override
-    public boolean onOptionItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
+    public void onCreateOptionsMenu(ActionBarMenu menu) {
+        menu.addItem(1, getMenuMoreDrawable()).setIsSearchField(true);
+    }
+
+    @Override
+    public boolean onOptionItemSelected(int menuId) {
+        if (menuId == -1) {
             getActivity().finish();
             return true;
         }

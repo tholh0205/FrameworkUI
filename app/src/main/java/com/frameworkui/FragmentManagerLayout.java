@@ -383,6 +383,14 @@ public class FragmentManagerLayout extends FrameLayout {
         try {
             if (mAddingOrRemovingFragment || FragmentAnimationUtils.isRunning())
                 return;
+
+            //Check fragment passcode
+            if (!mFragmentStack.isEmpty()) {
+                if (fragmentType == FragmentData.FragmentType.PASSCODE && mFragmentStack.get(mFragmentStack.size() - 1).mFragmentType.getTypeId() == fragmentType.getTypeId()) {
+                    return;
+                }
+            }
+
             mAddingOrRemovingFragment = true;
             if (data == null) {
                 data = new Bundle();
@@ -758,22 +766,22 @@ public class FragmentManagerLayout extends FrameLayout {
         mAddingOrRemovingFragment = false;
     }
 
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        if (!mFragmentStack.isEmpty()) {
-            if (mFragmentStack.get(mFragmentStack.size() - 1).getFragment().hasMenu) {
-                mFragmentStack.get(mFragmentStack.size() - 1).getFragment().onCreateOptionsMenu(menu, inflater);
-            }
-        }
-    }
-
-    public boolean onOptionItemSelected(MenuItem item) {
-        if (!mFragmentStack.isEmpty()) {
-            if (mFragmentStack.get(mFragmentStack.size() - 1).getFragment().onOptionItemSelected(item)) {
-                return true;
-            }
-        }
-        return false;
-    }
+//    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+//        if (!mFragmentStack.isEmpty()) {
+//            if (mFragmentStack.get(mFragmentStack.size() - 1).getFragment().hasMenu) {
+//                mFragmentStack.get(mFragmentStack.size() - 1).getFragment().onCreateOptionsMenu(menu, inflater);
+//            }
+//        }
+//    }
+//
+//    public boolean onOptionItemSelected(MenuItem item) {
+//        if (!mFragmentStack.isEmpty()) {
+//            if (mFragmentStack.get(mFragmentStack.size() - 1).getFragment().onOptionItemSelected(item)) {
+//                return true;
+//            }
+//        }
+//        return false;
+//    }
 
     public void onSaveInstanceState(Bundle outState) {
         if (!mFragmentStack.isEmpty()) {

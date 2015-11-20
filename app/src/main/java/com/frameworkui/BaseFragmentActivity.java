@@ -79,6 +79,9 @@ public class BaseFragmentActivity extends AppCompatActivity {
         super.onResume();
         if (!isCreating) {
             if (getFragmentManagerLayout() != null) {
+                if (Utils.USE_PASSCODE) {
+                    getFragmentManagerLayout().showFragment(FragmentData.FragmentType.PASSCODE, null, 0, true, false);
+                }
                 getFragmentManagerLayout().onResume();
             }
         }
@@ -116,21 +119,21 @@ public class BaseFragmentActivity extends AppCompatActivity {
         getFragmentManagerLayout().onSaveInstanceState(outState);
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        if (getFragmentManagerLayout() != null) {
-            getFragmentManagerLayout().onCreateOptionsMenu(menu, getMenuInflater());
-        }
-        return true;
-    }
+//    @Override
+//    public boolean onCreateOptionsMenu(Menu menu) {
+//        if (getFragmentManagerLayout() != null) {
+//            getFragmentManagerLayout().onCreateOptionsMenu(menu, getMenuInflater());
+//        }
+//        return true;
+//    }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (getFragmentManagerLayout() != null) {
-            getFragmentManagerLayout().onOptionItemSelected(item);
-        }
-        return true;
-    }
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item) {
+//        if (getFragmentManagerLayout() != null) {
+//            getFragmentManagerLayout().onOptionItemSelected(item);
+//        }
+//        return true;
+//    }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {

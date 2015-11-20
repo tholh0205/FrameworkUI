@@ -6,6 +6,7 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.TypedValue;
 import android.view.ActionMode;
@@ -483,8 +484,14 @@ public class ActionBarMenuItem extends FrameLayoutFixed {
                 clearButton.setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        searchField.setText("");
-                        Utils.showKeyboard(searchField);
+                        if (TextUtils.isEmpty(searchField.getText())) {
+                            if (parentMenu != null) {
+                                parentMenu.closeSearchField();
+                            }
+                        } else {
+                            searchField.setText("");
+                            Utils.showKeyboard(searchField);
+                        }
                     }
                 });
                 searchContainer.addView(clearButton);

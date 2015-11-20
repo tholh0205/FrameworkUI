@@ -14,7 +14,8 @@ public class FragmentData {
         CHAT(2, ChatFragment.class),
         PROFILE(3, ProfileFragment.class),
         GALLERY(4, GalleryFragment.class),
-        SEARCH(5, SearchFragment.class);
+        SEARCH(5, SearchFragment.class),
+        PASSCODE(6, PasscodeFragment.class);
 
         private int typeId;
         private Class<? extends BaseFragment> cls;

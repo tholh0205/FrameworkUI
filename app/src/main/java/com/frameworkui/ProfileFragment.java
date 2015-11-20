@@ -8,14 +8,19 @@ import android.widget.FrameLayout;
 
 import com.frameworkui.actionbar.ActionBar;
 import com.frameworkui.actionbar.ActionBarMenu;
+import com.frameworkui.actionbar.ActionBarMenuItem;
+import com.frameworkui.actionbar.MenuDrawable;
 
 /**
  * Created by ThoLH on 10/05/2015.
  */
 public class ProfileFragment extends BaseFragment {
 
+    private ActionBarMenu mMenu;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        hasMenu = true;
         mFragmentView = inflater.inflate(R.layout.profile_fragment, container, false);
         mFragmentView.findViewById(R.id.button).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -62,6 +67,18 @@ public class ProfileFragment extends BaseFragment {
 //        setResult(Activity.RESULT_OK, data);
 //        return super.onBackPressed();
 //    }
+
+
+    @Override
+    public void onCreateOptionsMenu(ActionBarMenu menu) {
+        ActionBarMenuItem itemMore = menu.addItem(1, new MenuDrawable());
+        itemMore.addSubItem(2, "Test 1", 0);
+        itemMore.addSubItem(3, "Test 2", 0);
+        itemMore.addSubItem(4, "Test 3", 0);
+        itemMore.addSubItem(5, "Test 4", 0);
+        itemMore.addSubItem(6, "Test 5", 0);
+        itemMore.addSubItem(7, "Test 6", 0);
+    }
 
     @Override
     public void onResume() {

@@ -26,6 +26,7 @@ public class SearchFragment extends BaseFragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        hasMenu = true;
         return inflater.inflate(R.layout.search_fragment, container, false);
     }
 
@@ -66,6 +67,13 @@ public class SearchFragment extends BaseFragment {
 //                dialogFragment.show(getActivity().getSupportFragmentManager(), "1234");
             }
         });
+
+        view.findViewById(R.id.btn_use_passcode).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Utils.USE_PASSCODE = !Utils.USE_PASSCODE;
+            }
+        });
     }
 
     @Override
@@ -76,14 +84,18 @@ public class SearchFragment extends BaseFragment {
         if (actionBar != null) {
             actionBar.setTitle("Search Fragment");
             actionBar.setBackButtonDrawable(getUpIndicator());
-            ActionBarMenu menu = actionBar.createMenu();
-            menu.addItem(1, getMenuMoreDrawable()).setIsSearchField(true).setActionBarMenuItemSearchListener(new ActionBarMenuItem.ActionBarMenuItemSearchListener() {
-                @Override
-                public void onTextChanged(EditText editText) {
-                    super.onTextChanged(editText);
-                    android.util.Log.d("ThoLH", "setIsSearchField " + editText.getText());
-                }
-            });
         }
+    }
+
+    @Override
+    public void onCreateOptionsMenu(ActionBarMenu menu) {
+        super.onCreateOptionsMenu(menu);
+        menu.addItem(1, getMenuMoreDrawable()).setIsSearchField(true).setActionBarMenuItemSearchListener(new ActionBarMenuItem.ActionBarMenuItemSearchListener() {
+            @Override
+            public void onTextChanged(EditText editText) {
+                super.onTextChanged(editText);
+                android.util.Log.d("ThoLH", "setIsSearchField " + editText.getText());
+            }
+        });
     }
 }

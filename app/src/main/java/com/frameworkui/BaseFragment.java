@@ -6,15 +6,13 @@ import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.support.v7.app.ActionBar;
-import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
+
+import com.frameworkui.actionbar.ActionBar;
+import com.frameworkui.actionbar.ActionBarMenu;
 
 /**
  * Created by ThoLH on 10/02/2015.
@@ -29,11 +27,12 @@ public class BaseFragment {
     boolean isStopped = false;
     boolean isStarted = false;
     public View mFragmentView = null;
-    private Toolbar mToolbar = null;
+    //    private Toolbar mToolbar = null;
     protected Bundle mArguments = null;
     private BaseFragmentActivity mBaseActivity = null;
     BaseFragment mParentFragment;
-    private com.frameworkui.actionbar.ActionBar mActionBar;
+    protected ActionBar mActionBar;
+    protected ActionBarMenu mMenu;
 
     private ChildFragmentManager mChildFragmentManager = new ChildFragmentManager();
 
@@ -87,11 +86,11 @@ public class BaseFragment {
         return mArguments;
     }
 
-    public Toolbar getToolbar() {
-        if (mToolbar == null && mFragmentView != null)
-            mToolbar = (Toolbar) mFragmentView.findViewById(R.id.toolbar);
-        return mToolbar;
-    }
+//    public Toolbar getToolbar() {
+//        if (mToolbar == null && mFragmentView != null)
+//            mToolbar = (Toolbar) mFragmentView.findViewById(R.id.toolbar);
+//        return mToolbar;
+//    }
 
 
     public void onSetupActionBar() {
@@ -109,6 +108,18 @@ public class BaseFragment {
         if (mActionBar != null) {
             mActionBar.setItemsBackground(R.drawable.bar_selector);
             mActionBar.parentFragment = this;
+            mActionBar.setActionBarMenuOnItemClick(new ActionBar.ActionBarMenuOnItemClick() {
+                @Override
+                public void onItemClick(int id) {
+                    onOptionItemSelected(id);
+                }
+            });
+            if (hasMenu) {
+                if (mMenu == null) {
+                    mMenu = mActionBar.createMenu();
+                    onCreateOptionsMenu(mMenu);
+                }
+            }
         }
     }
 
@@ -124,34 +135,25 @@ public class BaseFragment {
         return up;
     }
 
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+    public void onCreateOptionsMenu(ActionBarMenu menu) {
     }
 
-    public boolean onOptionItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
+    public boolean onOptionItemSelected(int menuId) {
+        if (menuId == -1) {
             return finishFragment(true);
         }
         return false;
     }
 
-    public void setTitle(int res) {
-        if (getToolbar() != null)
-            getToolbar().setTitle(res);
-    }
-
     public void setTitle(CharSequence title) {
-        if (getToolbar() != null)
-            getToolbar().setTitle(title);
+//        if (getToolbar() != null)
+//            getToolbar().setTitle(title);
     }
 
-    public void setSubtitle(int res) {
-        if (getToolbar() != null)
-            getToolbar().setSubtitle(res);
-    }
 
     public void setSubtitle(CharSequence subtitle) {
-        if (getToolbar() != null)
-            getToolbar().setSubtitle(subtitle);
+//        if (getToolbar() != null)
+//            getToolbar().setSubtitle(subtitle);
     }
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {

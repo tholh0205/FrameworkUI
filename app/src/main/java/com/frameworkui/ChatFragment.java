@@ -6,9 +6,6 @@ import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -16,9 +13,9 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import com.frameworkui.actionbar.ActionBar;
 import com.frameworkui.actionbar.ActionBarMenu;
 import com.frameworkui.actionbar.ActionBarMenuItem;
+import com.frameworkui.actionbar.MenuDrawable;
 
 /**
  * Created by ThoLH on 10/05/2015.
@@ -79,43 +76,34 @@ public class ChatFragment extends BaseFragment implements BaseFragment.ReusableF
     @Override
     public void onSetupActionBar() {
         super.onSetupActionBar();
-        ActionBar actionBar = (ActionBar) getView().findViewById(R.id.custom_action_bar);
-        if (actionBar != null) {
-            actionBar.setTitle("Chat Fragment");
-            actionBar.setBackButtonDrawable(getUpIndicator());
-            actionBar.setActionBarMenuOnItemClick(new ActionBar.ActionBarMenuOnItemClick() {
-                @Override
-                public void onItemClick(int id) {
-                    android.util.Log.d("ThoLH", "sub menu clicked " + id);
-                }
-            });
-            if (mMenu == null) {
-                mMenu = actionBar.createMenu();
-                ActionBarMenuItem itemMore = mMenu.addItem(1, getMenuMoreDrawable());
-                itemMore.addSubItem(2, "Xoá lịch sử trò chuyện", 0);
-                itemMore.addSubItem(3, "Test 2", 0);
-                itemMore.addSubItem(4, "Test 3", 0);
-//                mMenu.addItem(0, getUpIndicator());
-            }
-//            actionBar.setSubtitle("Test Fragment");
+
+        if (mActionBar != null) {
+            mActionBar.setTitle("Chat Fragment");
+            mActionBar.setBackButtonDrawable(getUpIndicator());
         }
-//        super.onSetupActionBar();
-//        ActionBar actionBar = getActivity().getSupportActionBar();
-//        if (actionBar != null) {
-//            setTitle("Chat Fragment");
-//            actionBar.setDisplayHomeAsUpEnabled(true);
-//        }
 
         getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-//        super.onCreateOptionsMenu(menu, inflater);
-        menu.clear();
-        inflater.inflate(R.menu.chat_menu, menu);
-        MenuItem itemMore = menu.findItem(R.id.menu_more);
-        itemMore.setIcon(getMenuMoreDrawable());
+    public void onCreateOptionsMenu(ActionBarMenu menu) {
+        /*ActionBarMenuItem itemMore = */
+        menu.addItem(1, new MenuDrawable());
+//        itemMore.addSubItem(2, "Xoá lịch sử trò chuyện", 0);
+//        itemMore.addSubItem(3, "Test 2", 0);
+//        itemMore.addSubItem(4, "Test 3", 0);
+    }
+
+    @Override
+    public boolean onOptionItemSelected(int menuId) {
+        super.onOptionItemSelected(menuId);
+        android.util.Log.d("ThoLH", "onOptionItemSelected == " + menuId);
+        if (menuId == 1) {
+            if (mDrawerLayout != null) {
+                mDrawerLayout.openDrawer(Gravity.RIGHT);
+            }
+        }
+        return false;
     }
 
     @Override

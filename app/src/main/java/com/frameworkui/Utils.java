@@ -77,4 +77,6 @@ public class Utils {
         return 0;
     }
 
+    public static boolean USE_PASSCODE = false;
+
 }

@@ -30,4 +30,13 @@
         android:layout_marginLeft="16.0dip"
         android:layout_marginTop="46.0dip"
         android:text="FRAGMENT DIALOG" />
+
+    <Button
+        android:id="@+id/btn_use_passcode"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="16.0dip"
+        android:layout_marginTop="46.0dip"
+        android:text="USE PASSCODE" />
+
 </LinearLayout>
