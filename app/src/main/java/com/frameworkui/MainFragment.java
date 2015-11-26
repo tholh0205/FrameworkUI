@@ -6,14 +6,17 @@ import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.frameworkui.actionbar.ActionBar;
-import com.frameworkui.actionbar.ActionBarMenu;
-import com.frameworkui.actionbar.MenuDrawable;
+import com.frameworkui.uicore.actionbar.ActionBar;
+import com.frameworkui.uicore.actionbar.ActionBarMenu;
+import com.frameworkui.uicore.actionbar.MenuDrawable;
+import com.frameworkui.uicore.BaseFragment;
+import com.frameworkui.uicore.BaseFragmentPagerAdapter;
+import com.frameworkui.uicore.ChildFragmentManager;
+import com.frameworkui.uicore.TabFragment;
 
 /**
  * Created by ThoLH on 10/05/2015.

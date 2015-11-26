@@ -1,4 +1,4 @@
-package com.frameworkui.actionbar;
+package com.frameworkui.uicore.actionbar;
 
 import android.content.Context;
 import android.graphics.Rect;
@@ -27,8 +27,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.frameworkui.R;
-import com.frameworkui.Utils;
-import com.frameworkui.widget.FrameLayoutFixed;
+import com.frameworkui.uicore.Utils;
+import com.frameworkui.uicore.widget.FrameLayoutFixed;
 import com.nineoldandroids.view.ViewHelper;
 
 import java.lang.reflect.Field;

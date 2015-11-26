@@ -1,4 +1,4 @@
-package com.frameworkui;
+package com.frameworkui.uicore;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -10,18 +10,16 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.AttributeSet;
 import android.view.Gravity;
-import android.view.KeyEvent;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowInsets;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
+import com.frameworkui.uicore.widget.InterceptTouchLinearLayout;
+import com.frameworkui.MainApplication;
+import com.frameworkui.R;
 import com.nineoldandroids.animation.Animator;
 import com.nineoldandroids.animation.AnimatorListenerAdapter;
 import com.nineoldandroids.animation.AnimatorSet;

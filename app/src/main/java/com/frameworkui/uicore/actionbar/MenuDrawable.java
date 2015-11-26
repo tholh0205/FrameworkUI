@@ -1,4 +1,4 @@
-package com.frameworkui.actionbar;
+package com.frameworkui.uicore.actionbar;
 
 import android.graphics.Canvas;
 import android.graphics.ColorFilter;
@@ -6,7 +6,7 @@ import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
 import android.view.animation.DecelerateInterpolator;
 
-import com.frameworkui.Utils;
+import com.frameworkui.uicore.Utils;
 
 
 public class MenuDrawable extends Drawable {

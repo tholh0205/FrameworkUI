@@ -1,4 +1,4 @@
-package com.frameworkui.widget;
+package com.frameworkui.uicore.widget;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -8,7 +8,7 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.widget.FrameLayout;
 
-import com.frameworkui.Utils;
+import com.frameworkui.uicore.Utils;
 
 /**
  * Created by ThoLH on 11/19/15.

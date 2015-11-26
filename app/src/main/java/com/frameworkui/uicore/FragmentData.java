@@ -1,8 +1,16 @@
-package com.frameworkui;
+package com.frameworkui.uicore;
 
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
+
+import com.frameworkui.ChatFragment;
+import com.frameworkui.GalleryFragment;
+import com.frameworkui.MainApplication;
+import com.frameworkui.MainFragment;
+import com.frameworkui.PasscodeFragment;
+import com.frameworkui.ProfileFragment;
+import com.frameworkui.SearchFragment;
 
 /**
  * Created by ThoLH on 10/7/15.

@@ -6,10 +6,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
-import com.frameworkui.actionbar.ActionBar;
-import com.frameworkui.actionbar.ActionBarMenu;
-import com.frameworkui.actionbar.ActionBarMenuItem;
-import com.frameworkui.actionbar.MenuDrawable;
+import com.frameworkui.uicore.actionbar.ActionBar;
+import com.frameworkui.uicore.actionbar.ActionBarMenu;
+import com.frameworkui.uicore.actionbar.ActionBarMenuItem;
+import com.frameworkui.uicore.actionbar.MenuDrawable;
+import com.frameworkui.uicore.BaseFragment;
+import com.frameworkui.uicore.FragmentData;
 
 /**
  * Created by ThoLH on 10/05/2015.

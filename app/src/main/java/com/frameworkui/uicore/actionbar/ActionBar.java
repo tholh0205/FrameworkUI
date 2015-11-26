@@ -1,10 +1,8 @@
-package com.frameworkui.actionbar;
+package com.frameworkui.uicore.actionbar;
 
 import android.content.Context;
 import android.content.res.Configuration;
-import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.TypedValue;
@@ -16,10 +14,10 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.frameworkui.BaseFragment;
+import com.frameworkui.uicore.BaseFragment;
 import com.frameworkui.MainApplication;
 import com.frameworkui.R;
-import com.frameworkui.Utils;
+import com.frameworkui.uicore.Utils;
 
 /**
  * Created by ThoLH on 11/17/15.

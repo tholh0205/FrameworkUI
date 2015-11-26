@@ -1,4 +1,4 @@
-package com.frameworkui.actionbar;
+package com.frameworkui.uicore.actionbar;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
@@ -6,7 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
 
-import com.frameworkui.Utils;
+import com.frameworkui.uicore.Utils;
 
 /**
  * Created by ThoLH on 11/17/15.

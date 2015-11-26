@@ -1,18 +1,19 @@
 package com.frameworkui;
 
-import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 
-import com.frameworkui.actionbar.ActionBar;
-import com.frameworkui.actionbar.ActionBarMenu;
-import com.frameworkui.actionbar.ActionBarMenuItem;
+import com.frameworkui.uicore.actionbar.ActionBar;
+import com.frameworkui.uicore.actionbar.ActionBarMenu;
+import com.frameworkui.uicore.actionbar.ActionBarMenuItem;
+import com.frameworkui.uicore.BaseFragment;
+import com.frameworkui.uicore.FragmentData;
+import com.frameworkui.uicore.Utils;
 
 /**
  * Created by ThoLH on 10/26/15.

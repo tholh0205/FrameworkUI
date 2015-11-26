@@ -5,6 +5,8 @@ import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 
+import com.frameworkui.uicore.Utils;
+
 /**
  * Created by ThoLH on 10/02/2015.
  */

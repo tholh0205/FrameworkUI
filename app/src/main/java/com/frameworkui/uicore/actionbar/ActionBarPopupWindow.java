@@ -1,4 +1,4 @@
-package com.frameworkui.actionbar;
+package com.frameworkui.uicore.actionbar;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -15,7 +15,7 @@ import android.widget.PopupWindow;
 import android.widget.ScrollView;
 
 import com.frameworkui.R;
-import com.frameworkui.Utils;
+import com.frameworkui.uicore.Utils;
 import com.nineoldandroids.animation.Animator;
 import com.nineoldandroids.animation.AnimatorSet;
 import com.nineoldandroids.animation.ObjectAnimator;

@@ -1,4 +1,4 @@
-package com.frameworkui;
+package com.frameworkui.uicore.widget;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -7,6 +7,8 @@ import android.support.v4.view.MotionEventCompat;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.widget.LinearLayout;
+
+import com.frameworkui.uicore.Utils;
 
 /**
  * Created by ThoLH on 11/2/15.

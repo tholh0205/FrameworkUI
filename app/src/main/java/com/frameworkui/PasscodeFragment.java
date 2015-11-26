@@ -5,6 +5,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.frameworkui.uicore.BaseFragment;
+
 /**
  * Created by ThoLH on 11/20/15.
  */

@@ -1,4 +1,4 @@
-package com.frameworkui;
+package com.frameworkui.uicore;
 
 import android.view.View;
 import android.view.animation.AccelerateInterpolator;

@@ -2,6 +2,9 @@ package com.frameworkui;
 
 import android.os.Bundle;
 
+import com.frameworkui.uicore.BaseFragmentActivity;
+import com.frameworkui.uicore.FragmentData;
+
 public class MainActivity extends BaseFragmentActivity {
 
     @Override
